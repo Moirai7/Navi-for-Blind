@@ -21,7 +21,7 @@ public class PathOperationService extends Service {
 	Map<String, Node> nodes = new HashMap<String, Node>();
 	Map<String, Road> roads = new HashMap<String, Road>();
 	Map<String, Path> allPoints = new HashMap<String, Path>();
-	double aboutLen;
+	double aboutLen = 1.0;
 	// for algorithm
 	Map<String, Double> shortLenMap = new HashMap<String, Double>();
 	Set<Node> inPath = new HashSet<Node>();
@@ -37,29 +37,10 @@ public class PathOperationService extends Service {
 	String finalStartNode;
 	List<String> shortestNodes = new ArrayList<String>();
 
-	// inner_class getstartId
-	public void setStart(String NodeID, double Len) {
-		shortLenMap.clear();
-		Node start = new Node();
-		start = nodes.get(NodeID);
-		inPath.add(start);
-		Iterator it = nodes.keySet().iterator();
-		while (it.hasNext()) {
-			String tmpNodeID=it.next().toString();
-			if (!tmpNodeID.equals(NodeID)) {
-				Node outer = new Node();
-				outer.nid = tmpNodeID;
-				outer = nodes.get(outer.nid);
-				outPath.add(outer);
-				shortLenMap.put(outer.nid, 9999999.0);
-			}
-		}
-		shortLenMap.put(NodeID, Len);
-	}
-
 	// run when sys start
 	public void init() {
 		db = Database.getInstance(this);
+		db.setPlace();
 		db.setRoads();
 		nodeID = db.getNodes();
 		for (String NodeID : nodeID) {
@@ -89,9 +70,43 @@ public class PathOperationService extends Service {
 		}
 	}
 
+	// inner_class getstartId
+	public void setStart(String NodeID, double Len) {
+		shortLenMap.clear();
+		inPath.clear();
+		outPath.clear();
+		Node start = new Node();
+		start = nodes.get(NodeID);
+		inPath.add(start);
+		Iterator it = nodes.keySet().iterator();
+		while (it.hasNext()) {
+			String tmpNodeID = it.next().toString();
+			if (!tmpNodeID.equals(NodeID)) {
+				Node outer = new Node();
+				outer.nid = tmpNodeID;
+				outer = nodes.get(outer.nid);
+				outPath.add(outer);
+				shortLenMap.put(outer.nid, 9999999.0);
+			}
+		}
+		shortLenMap.put(NodeID, Len);
+	}
+
 	// (!)all path
-	public void FindPath(String startNode, Node endNode, double len) {
+	public void getFindPath(String startNode, Node endNode, double len) {
 		Map<String, String> tmpPath = new HashMap<String, String>();
+		//
+//		if (!nodeID.contains(startNode)&&!nodeID.contains(endNode.nid)){
+//			Path tmpStartPath = allPoints.get(startNode);
+//			Path tmpEndPath = allPoints.get(endNode.nid);
+//			if (tmpStartPath.getStreetID().equals(tmpEndPath.getStreetID())){
+//				minLen = Math.abs(Double.valueOf(startNode)-Double.valueOf(endNode.nid));
+//				path = tmpPath;
+//				finalEndNode = endNode.nid;
+//				finalStartNode = startNode;
+//				return ;
+//			}
+//		}
 		while (!inPath.contains(endNode)) {
 			double mmin = 9999999.0;// max
 			Node fromnode = new Node();
@@ -135,7 +150,7 @@ public class PathOperationService extends Service {
 			return;
 		} else {
 			Path tmpPath = allPoints.get(curNodeID);
-			String aaa = tmpPath.getStreetID();
+			// String aaa = tmpPath.getStreetID();
 			Road tmpRoad = roads.get(tmpPath.getStreetID());
 			aboutStartLenMap.put(
 					tmpRoad.start,
@@ -156,6 +171,8 @@ public class PathOperationService extends Service {
 	public void getAboutEndLen(String place) {
 		endNodes = db.getCertainNode(place);
 		aboutEndLenMap.clear();
+		if (endNodes.isEmpty())
+			return;
 		for (int i = 0; i < endNodes.size(); i++) {
 			String tmpNode = endNodes.get(i);
 			if (nodeID.contains(tmpNode)) {
@@ -197,10 +214,10 @@ public class PathOperationService extends Service {
 		}
 	}
 
-	//inner_class checkpoint
+	// inner_class checkpoint
 	protected int checkCurPoint(String curNodeID) {
 		int pos = shortestNodes.indexOf(curNodeID);
-		if (pos == shortestNodes.size()-1){
+		if (pos == shortestNodes.size() - 1) {
 			return 3;
 		}
 		if (pos == -1) {
@@ -212,7 +229,7 @@ public class PathOperationService extends Service {
 					|| shortestNodes.indexOf(tmpRoad.start) == -1) {
 				return 0;
 			} else if (Math.abs(shortestNodes.indexOf(tmpRoad.start)
-					- shortestNodes.indexOf(tmpRoad.start)) == 1) {
+					- shortestNodes.indexOf(tmpRoad.end)) == 1) {
 				return 1;
 			} else {
 				return 0;
@@ -223,59 +240,73 @@ public class PathOperationService extends Service {
 	}
 
 	public class MyBinder extends Binder {
-		
-		public void initStartService(){
+
+		public void initStartService() {
 			init();
 		}
-		
+
 		public void findPath(String startID, String endName) {
 			// 查找路径，返回下一步String
+			shortestNodes.clear();
 			getAboutStartLen(startID);
 			getAboutEndLen(endName);
+			if (aboutEndLenMap.isEmpty()) {
+				String str = "没有这个地方呢";
+				Message msg = Message.obtain();
+				msg.what = Config.NONEPLACE;
+				msg.obj = str;
+				BaseActivity.sendMessage(msg);
+				return;
+			}
 			minLen = 9999999.0;
 			for (String startnode : aboutStartLenMap.keySet()) {
-				setStart(startnode, aboutStartLenMap.get(startnode));
 				for (String endnode : aboutEndLenMap.keySet()) {
-					FindPath(startnode, nodes.get(endnode),
+					setStart(startnode, aboutStartLenMap.get(startnode));
+					getFindPath(startnode, nodes.get(endnode),
 							aboutEndLenMap.get(endnode));
 				}
 			}
 			String tmpNode = finalEndNode;
 			shortestNodes.add(tmpNode);
-			while (!path.get(tmpNode).equals(finalStartNode)) {
-				shortestNodes.add(0, path.get(tmpNode));
-				tmpNode = path.get(tmpNode);
-			}
-			shortestNodes.add(0, finalStartNode);
-			shortestNodes.add(0, startID);
+			if (!path.isEmpty())
+				while (!path.get(tmpNode).equals(finalStartNode)) {
+					shortestNodes.add(0, path.get(tmpNode));
+					tmpNode = path.get(tmpNode);
+				}
+			if (!shortestNodes.get(0).equals(finalStartNode))
+				shortestNodes.add(0, finalStartNode);
+			if (!shortestNodes.get(0).equals(startID))
+				shortestNodes.add(0, startID);
 			shortestNodes.add(aboutEndMap.get(finalEndNode));
-			
-			String str = "选路成功，请向"+shortestNodes.get(1)+"走";
+
+			String str = "选路成功，请向" + shortestNodes.get(1) + "走";
 			Message msg = Message.obtain();
 			msg.what = Config.SUCCESS;
 			msg.obj = str;
 			BaseActivity.sendMessage(msg);
+			return;
 		}
 
 		public void CheckPoint(String currentID) {
 			// 判断是否偏离路径，返回下一步String
 			String str = null;
-			if (checkCurPoint(currentID)==3){
-				
-			} else if (checkCurPoint(currentID)==1){
-				str="正确";
-			} else if (checkCurPoint(currentID)==2){
+			if (checkCurPoint(currentID) == 3) {
+				str = "到了";
+			} else if (checkCurPoint(currentID) == 1) {
+				str = "正确,继续前进";
+			} else if (checkCurPoint(currentID) == 2) {
 				int pos = shortestNodes.indexOf(currentID);
-				str="正确，请向"+shortestNodes.get(pos+1)+"走";
-			} else{
-				str="偏离";
+				str = "正确，请向" + shortestNodes.get(pos + 1) + "走";
+			} else {
+				str = "偏离";
 			}
 			Message msg = Message.obtain();
-			if (checkCurPoint(currentID)==0) msg.what = Config.FAIl;
-			else if (checkCurPoint(currentID)==3){
+			if (checkCurPoint(currentID) == 0)
+				msg.what = Config.FAIl;
+			else if (checkCurPoint(currentID) == 3) {
 				msg.what = Config.ACK_END_POINT;// Config.FAIL
 			} else {
-				msg.what = Config.FAIl;// Config.FAIL				
+				msg.what = Config.FAIl;// Config.FAIL
 			}
 			msg.obj = str;
 			BaseActivity.sendMessage(msg);
