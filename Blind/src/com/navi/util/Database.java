@@ -32,10 +32,6 @@ public class Database {
 	private SQLiteDatabase db;
 	private static Database database = null;
 
-	private Database() {
-
-	}
-
 	public void closeDatabase() {
 		context = null;
 		database = null;
@@ -45,13 +41,6 @@ public class Database {
 	public static Database getInstance(Context context) {
 		if (database == null)
 			return new Database(context);
-		else
-			return database;
-	}
-
-	public static Database getInstance() {
-		if (database == null)
-			return new Database();
 		else
 			return database;
 	}
@@ -117,12 +106,39 @@ public class Database {
 		return true;
 	}
 
+	// fill the ID->place
 	public boolean setPlace() {
-		Cursor rs = db
-				.rawQuery("select pointID,pointName from PathInfo ", null);
+		db.execSQL("DELETE FROM PlaceInfo");
+		Cursor rs = db.rawQuery(
+				"select pointID,pointSurroundingInfo from PathInfo ", null);
+		List<String> pointInfo = new ArrayList<String>();
+		try {
+			if (rs != null) {
+				if (rs.moveToFirst()) {
+					do {
+						String pointID = rs.getString(rs
+								.getColumnIndex("pointID"));
+						String pointSI = rs.getString(rs
+								.getColumnIndex("pointSurroundingInfo"));
+						if (pointSI.equals("0"))
+							continue;
+						JSONArray ja = new JSONArray(pointSI);
+						for (int i = 0; i < ja.length(); i++) {
+							ContentValues values = new ContentValues();
+							values.put("NodeID", pointID);
+							values.put("PID", ja.getString(i));
+							db.insert("PlaceInfo", "NodeID", values);
+						}
+					} while (rs.moveToNext());
+				}
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 		return true;
 	}
 
+	// fill the roads
 	public boolean setRoads() {
 		db.execSQL("DELETE FROM RoadInfo");
 		Cursor rs = db.rawQuery(
@@ -134,8 +150,8 @@ public class Database {
 			if (rs != null)
 				if (rs.moveToFirst()) {
 					do {
-						String str = rs.getString(rs
-								.getColumnIndex("streetID"));
+						String str = rs
+								.getString(rs.getColumnIndex("streetID"));
 						JSONArray ja = new JSONArray(str);
 						streetIDF.add(str);
 						streetW.add(ja.getString(1));
@@ -162,7 +178,7 @@ public class Database {
 				values.put("second", nodesID.get(1));
 				values.put("third", nodesID.get(2));
 				values.put("end", nodesID.get(3));
-				values.put("weigth", streetW.get(i));
+				values.put("weight", streetW.get(i));
 				db.insert("RoadInfo", "RID", values);
 			}
 		} catch (JSONException e) {
@@ -171,6 +187,7 @@ public class Database {
 		return true;
 	}
 
+	// get all cross node
 	public Set<String> getNodes() {
 		Cursor rs = db.rawQuery("select start,end from RoadInfo", null);
 		Set<String> nodes = new HashSet<String>();
@@ -192,18 +209,22 @@ public class Database {
 		}
 		return nodes;
 	}
-	
-	public Set<String> getRoads(){
+
+	// get all roads
+	public Set<String> getRoads() {
 		Cursor rs = db.rawQuery("select RID from RoadInfo", null);
-		Set<String> roads =new HashSet<String>();
-		if (rs!=null){
-			if (rs.moveToFirst()){
-				roads.add(rs.getString(rs.getColumnIndex("RID")));
-			} while (rs.moveToNext());
+		Set<String> roads = new HashSet<String>();
+		if (rs != null) {
+			if (rs.moveToFirst()) {
+				do {
+					roads.add(rs.getString(rs.getColumnIndex("RID")));
+				} while (rs.moveToNext());
+			}
 		}
 		return roads;
 	}
-	
+
+	// get node from placeinfo by placename
 	public List<String> getCertainNode(String place) {
 		Cursor rs = db.rawQuery("select NodeID from PlaceInfo where PID = '"
 				+ place + "'", null);
@@ -218,24 +239,28 @@ public class Database {
 		return nodes;
 
 	}
-	
-	public Map<String,Double> getChild(String father) {
-		Cursor rs = db.rawQuery("select end,weight from RoadInfo where start ='"
-				+ father + "'", null);
-		Map<String,Double> child = new HashMap<String,Double>();
+
+	// get the nodes' childs
+	public Map<String, Double> getChild(String father) {
+		Cursor rs = db
+				.rawQuery("select end,weight from RoadInfo where start ='"
+						+ father + "'", null);
+		Map<String, Double> child = new HashMap<String, Double>();
 		if (rs != null) {
 			if (rs.moveToFirst()) {
 				do {
-					child.put(rs.getString(rs.getColumnIndex("end")), Double.valueOf(rs.getString(rs.getColumnIndex("weight"))));
+					child.put(rs.getString(rs.getColumnIndex("end")), Double
+							.valueOf(rs.getString(rs.getColumnIndex("weight"))));
 				} while (rs.moveToNext());
 			}
 		}
-		rs = db.rawQuery("select start,weight from RoadInfo where end ='" + father
-				+ "'", null);
+		rs = db.rawQuery("select start,weight from RoadInfo where end ='"
+				+ father + "'", null);
 		if (rs != null) {
 			if (rs.moveToFirst()) {
 				do {
-					child.put(rs.getString(rs.getColumnIndex("start")), Double.valueOf(rs.getString(rs.getColumnIndex("weight"))));
+					child.put(rs.getString(rs.getColumnIndex("start")), Double
+							.valueOf(rs.getString(rs.getColumnIndex("weight"))));
 				} while (rs.moveToNext());
 			}
 		}
@@ -243,11 +268,14 @@ public class Database {
 		return child;
 	}
 
-	public List<String> getRoad(String roadID){
-		Cursor rs = db.rawQuery("select start,second,third,end,weight from RoadInfo where RID='"+roadID+"'", null);
-		List<String> road=new ArrayList<String>();
-		if (rs!=null){
-			if (rs.moveToFirst()){
+	// get specific road info
+	public List<String> getRoad(String roadID) {
+		Cursor rs = db.rawQuery(
+				"select start,second,third,end,weight from RoadInfo where RID='"
+						+ roadID + "'", null);
+		List<String> road = new ArrayList<String>();
+		if (rs != null) {
+			if (rs.moveToFirst()) {
 				road.add(rs.getString(rs.getColumnIndex("start")));
 				road.add(rs.getString(rs.getColumnIndex("second")));
 				road.add(rs.getString(rs.getColumnIndex("third")));

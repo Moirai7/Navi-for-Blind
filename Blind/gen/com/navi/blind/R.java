@@ -63,49 +63,49 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int bind_service=0x7f080011;
         public static final int bmapView=0x7f080005;
         public static final int bt_downloadmap=0x7f08002f;
-        public static final int bt_register=0x7f080022;
+        public static final int bt_register=0x7f08002b;
         public static final int bt_save_detail=0x7f08002e;
         public static final int button1=0x7f080007;
         public static final int button2=0x7f080030;
-        public static final int customicon=0x7f080029;
+        public static final int customicon=0x7f08001b;
         public static final int download=0x7f080000;
         public static final int download_his=0x7f080013;
-        public static final int edit_password1_reg=0x7f08001c;
-        public static final int edit_password2_reg=0x7f08001f;
-        public static final int edit_username_reg=0x7f080019;
+        public static final int edit_password1_reg=0x7f080025;
+        public static final int edit_password2_reg=0x7f080028;
+        public static final int edit_username_reg=0x7f080022;
         public static final int et_detail=0x7f08002c;
-        public static final int et_end=0x7f080026;
+        public static final int et_end=0x7f080018;
         public static final int et_receiver=0x7f08002d;
-        public static final int et_start=0x7f080024;
+        public static final int et_start=0x7f080016;
         public static final int history=0x7f080031;
-        public static final int iv=0x7f080028;
-        public static final int layout1=0x7f080015;
-        public static final int layout2=0x7f080017;
-        public static final int layout3=0x7f08001a;
-        public static final int layout4=0x7f08001d;
-        public static final int layout5=0x7f080020;
+        public static final int iv=0x7f08001a;
+        public static final int layout1=0x7f08001e;
+        public static final int layout2=0x7f080020;
+        public static final int layout3=0x7f080023;
+        public static final int layout4=0x7f080026;
+        public static final int layout5=0x7f080029;
         public static final int login=0x7f08000d;
-        public static final int map=0x7f080027;
+        public static final int map=0x7f080019;
         public static final int naviStart=0x7f080014;
-        public static final int next=0x7f08002b;
+        public static final int next=0x7f08001d;
         public static final int pointid=0x7f080001;
-        public static final int pre=0x7f08002a;
+        public static final int pre=0x7f08001c;
         public static final int pwd=0x7f08000c;
-        public static final int pwd1=0x7f08001b;
-        public static final int pwd2=0x7f08001e;
+        public static final int pwd1=0x7f080024;
+        public static final int pwd2=0x7f080027;
         public static final int read_local=0x7f080004;
         public static final int register=0x7f08000e;
-        public static final int reset=0x7f080021;
+        public static final int reset=0x7f08002a;
         public static final int start_service=0x7f08000f;
         public static final int stop_service=0x7f080010;
         public static final int submit=0x7f080002;
         public static final int submit_local=0x7f080003;
-        public static final int textView1=0x7f080023;
-        public static final int textView2=0x7f080025;
-        public static final int textview1=0x7f080016;
+        public static final int textView1=0x7f080015;
+        public static final int textView2=0x7f080017;
+        public static final int textview1=0x7f08001f;
         public static final int tv_location=0x7f080006;
         public static final int unbind_service=0x7f080012;
-        public static final int user=0x7f080018;
+        public static final int user=0x7f080021;
     }
     public static final class layout {
         public static final int activity_download=0x7f030000;
@@ -113,10 +113,11 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int activity_login=0x7f030002;
         public static final int activity_main=0x7f030003;
         public static final int activity_navi=0x7f030004;
-        public static final int activity_register=0x7f030005;
-        public static final int activity_routeplan=0x7f030006;
-        public static final int activity_sendmessage=0x7f030007;
-        public static final int activity_showpos=0x7f030008;
+        public static final int activity_passstart=0x7f030005;
+        public static final int activity_register=0x7f030006;
+        public static final int activity_routeplan=0x7f030007;
+        public static final int activity_sendmessage=0x7f030008;
+        public static final int activity_showpos=0x7f030009;
     }
     public static final class raw {
         public static final int blind=0x7f040000;
@@ -142,6 +143,18 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
             backward-compatibility can go here.
 
         
+
+        Base application theme for API 11+. This theme completely replaces
+        AppBaseTheme from res/values/styles.xml on API 11+ devices.
+
+    
+ API 11 theme customizations can go here. 
+
+        Base application theme for API 14+. This theme completely replaces
+        AppBaseTheme from BOTH res/values/styles.xml and
+        res/values-v11/styles.xml on API 14+ devices.
+    
+ API 14 theme customizations can go here. 
          */
         public static final int AppBaseTheme=0x7f070000;
         /**  Application theme. 
@@ -150,6 +163,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int AppTheme=0x7f070001;
         public static final int ButtonBar=0x7f070003;
         public static final int ButtonBarButton=0x7f070004;
+        public static final int FullscreenActionBarStyle=0x7f070005;
         public static final int FullscreenTheme=0x7f070002;
     }
     public static final class styleable {

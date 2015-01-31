@@ -20,18 +20,16 @@
 
          <activity
             android:name="NaviActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/app_name"
             android:theme="@style/FullscreenTheme" >
 
         </activity>
         <activity
             android:name="DownloadActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/app_name"
             android:theme="@style/FullscreenTheme" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter> 
         </activity>
         <activity
             android:name="com.navi.blind.SendMessageActivity"
@@ -52,7 +50,12 @@
         <activity
             android:name="com.navi.baidu.RoutePlanActivity"
             android:configChanges="orientation|keyboardHidden"
-            android:screenOrientation="sensor" >   
+            android:screenOrientation="sensor" >
+           <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>              
         </activity>
         <activity android:name="com.navi.blind.LoginActivity" >
         </activity>
@@ -62,13 +65,15 @@
             <intent-filter >
             <category android:name="android.intent.category.DEFAULT" />
             <category android:name="android.intent.category.BROWSABLE" />
-            
+
             <data
                 android:host="moirai.cn"
                 android:scheme="m" />
             </intent-filter>
         </activity>
-
+        <activity android:name="com.navi.blind.PassStartActivity" >
+          
+        </activity>
         <service
             android:name="com.baidu.location.f"
             android:enabled="true"

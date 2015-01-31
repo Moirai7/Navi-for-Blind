@@ -1,4 +1,4 @@
-package com.navi.baidu;
+package com.navi.blind;
 
 import java.util.List;
 
@@ -8,12 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Paint.Style;
-import android.graphics.Path;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Message;
@@ -35,8 +29,6 @@ import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapView;
-import com.baidu.mapapi.map.Overlay;
-import com.baidu.mapapi.map.Projection;
 import com.baidu.mapapi.map.UiSettings;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.overlayutil.DrivingRouteOvelray;
@@ -45,8 +37,6 @@ import com.baidu.mapapi.overlayutil.TransitRouteOverlay;
 import com.baidu.mapapi.overlayutil.WalkingRouteOverlay;
 import com.baidu.mapapi.search.core.RouteLine;
 import com.baidu.mapapi.search.core.SearchResult;
-import com.baidu.mapapi.search.geocode.GeoCodeResult;
-import com.baidu.mapapi.search.geocode.GeoCoder;
 import com.baidu.mapapi.search.route.DrivingRouteLine;
 import com.baidu.mapapi.search.route.DrivingRouteResult;
 import com.baidu.mapapi.search.route.OnGetRoutePlanResultListener;
@@ -59,20 +49,19 @@ import com.baidu.mapapi.search.route.WalkingRouteLine;
 import com.baidu.mapapi.search.route.WalkingRouteResult;
 import com.iflytek.speech.SpeechRecognizer;
 import com.iflytek.speech.SpeechSynthesizer;
+import com.navi.baidu.BaiduApplication;
 import com.navi.blind.BaseActivity;
 import com.navi.blind.R;
-import com.navi.blind.ShowPositionActivity.PathInfo;
 import com.navi.client.Config;
 import com.navi.util.BluetoothService;
 import com.navi.util.PathOperationService;
 import com.navi.voice.*;
-import com.navi.voice.VoiceService.MyBinder;
 
 /**
  * 此demo用来展示如何进行驾车、步行、公交路线搜索并在地图使用RouteOverlay、TransitOverlay绘制
  * 同时展示如何进行节点浏览并弹出泡泡
  */
-public class RoutePlanActivity extends BaseActivity implements
+public class PassStartActivity extends BaseActivity implements
 		OnGetRoutePlanResultListener {
 	// 浏览路线节点相关
 	Button mBtnPre = null;// 上一个节点
@@ -119,7 +108,7 @@ public class RoutePlanActivity extends BaseActivity implements
 	public static boolean flag_tts = false;
 	public static boolean isFirstLoc = true;
 
-	public static boolean path_flag, voice_flag = false;
+	public static boolean voice_flag, path_flag = false;
 
 	// 定位
 	LocationClient mLocClient;
@@ -136,9 +125,34 @@ public class RoutePlanActivity extends BaseActivity implements
 	private String startpoint;
 	private boolean checkpoint = false;
 
-	private Intent intent_path, intent_bluetooth, intent_voice_service;
-	
-	private int counter=0; // 1. 第一次，起点  2. 第二次，终点
+	// private Intent intent_path,intent_bluetooth;
+
+	private ServiceConnection connection_path = new ServiceConnection() {
+
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+			path_flag = false;
+		}
+
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			path_binder = (PathOperationService.MyBinder) service;
+			path_binder.initStartService();
+			//test
+//			path_binder.findPath("006", "B");// 起始在同一条路
+//			path_binder.findPath("001", "S");// 没有这个地方呢
+//			path_binder.findPath("002", "B");//只差一条路
+//			path_binder.findPath("001", "D");//正常
+// 			path_binder.CheckPoint("002");//继续前进
+// 			path_binder.CheckPoint("004");//请向007走
+// 			path_binder.CheckPoint("012");//偏离
+// 			path_binder.CheckPoint("011");//到了
+			path_flag = true;
+			Log.v("tag", "bind");
+			if (voice_flag)
+				StartRead("请根据提示说出终点", Config.ACK_SAY_END);
+		}
+	};
 
 	private ServiceConnection connection_voice = new ServiceConnection() {
 
@@ -153,25 +167,8 @@ public class RoutePlanActivity extends BaseActivity implements
 			voice_flag = true;
 			Log.v("tag", "bind");
 
-			//if (path_flag)
-			//StartRead("请根据提示说出起点和终点", Config.ACK_SAY_START);
-		}
-	};
-
-	private ServiceConnection connection_path = new ServiceConnection() {
-
-		@Override
-		public void onServiceDisconnected(ComponentName name) {
-			path_flag = false;
-		}
-
-		@Override
-		public void onServiceConnected(ComponentName name, IBinder service) {
-			path_binder = (PathOperationService.MyBinder) service;
-			path_flag = true;
-			Log.v("tag", "bind");
-			//StartRead("请根据提示说出起点和终点", Config.ACK_SAY_START);
-			// StartRead("请根据提示说出终点", Config.ACK_SAY_END);
+			if (path_flag)
+				StartRead("请根据提示说出终点", Config.ACK_SAY_END);
 		}
 	};
 
@@ -195,6 +192,7 @@ public class RoutePlanActivity extends BaseActivity implements
 		setContentView(R.layout.activity_routeplan);
 		CharSequence titleLable = "路线规划功能";
 		setTitle(titleLable);
+		db.getInstance(this);
 		// 初始化地图
 		mMapView = (MapView) findViewById(R.id.map);
 		mBaidumap = mMapView.getMap();
@@ -272,34 +270,12 @@ public class RoutePlanActivity extends BaseActivity implements
 		UiSettings mUiSettings = mBaidumap.getUiSettings();
 		mUiSettings.setAllGesturesEnabled(false);
 
-		intent_voice_service = new Intent(this, VoiceService.class);
+		// intent_main_service = new Intent(this, VoiceService.class);
 		BaiduApplication app = (BaiduApplication) getApplication();
 
 		// myBinder = app.getBinder();
 
-		 StartRoute();
-
-	}
-
-	@Override
-	protected void onStart() {
-
-		Intent intent_path_service = new Intent(this,
-				PathOperationService.class);
-		startService(intent_path_service);
-		bindService(intent_path_service, connection_path, BIND_AUTO_CREATE);
-
-		Intent intent_voice_service = new Intent(this, VoiceService.class);
-		startService(intent_voice_service);
-		bindService(intent_voice_service, connection_voice, BIND_AUTO_CREATE);
-
-		// Intent intent_bluetooth_service = new Intent(this,
-		// PathOperationService.class);
-		//
-		// startService(intent_bluetooth_service);
-		// bindService(intent_bluetooth_service, connection_bluetooth,
-		// BIND_AUTO_CREATE);
-		super.onStart();
+		// StartRoute();
 
 	}
 
@@ -440,7 +416,7 @@ public class RoutePlanActivity extends BaseActivity implements
 	@Override
 	public void onGetWalkingRouteResult(WalkingRouteResult result) {
 		if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) {
-			Toast.makeText(RoutePlanActivity.this, "抱歉，未找到结果",
+			Toast.makeText(PassStartActivity.this, "抱歉，未找到结果",
 					Toast.LENGTH_SHORT).show();
 
 		}
@@ -468,7 +444,7 @@ public class RoutePlanActivity extends BaseActivity implements
 	public void onGetTransitRouteResult(TransitRouteResult result) {
 
 		if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) {
-			Toast.makeText(RoutePlanActivity.this, "抱歉，未找到结果",
+			Toast.makeText(PassStartActivity.this, "抱歉，未找到结果",
 					Toast.LENGTH_SHORT).show();
 			StartRead("无结果，请单击屏幕重试", Config.ACK_NONE);
 		}
@@ -510,21 +486,16 @@ public class RoutePlanActivity extends BaseActivity implements
 			while (nodeIndex >= 0 && nodeIndex < route.getAllStep().size()) {
 				// 获取节结果信息
 				LatLng nodeLocation = null;
-				String routeTitle = null;
+				String nodeTitle = null;
 				Object step = route.getAllStep().get(nodeIndex);
-				
-				String nodeTitle = ((TransitRouteLine.TransitStep) step).getEntrace().getTitle();
-				
+
 				nodeLocation = ((TransitRouteLine.TransitStep) step)
 						.getEntrace().getLocation();
-				routeTitle = ((TransitRouteLine.TransitStep) step)
+				nodeTitle = ((TransitRouteLine.TransitStep) step)
 						.getInstructions();
 
-				location += routeTitle;
-				
-				String start = route.getStarting().getTitle();
-				String end = ((TransitRouteLine.TransitStep) step).getExit().getTitle();
-				
+				location += nodeTitle;
+
 				nodeIndex++;
 
 			}
@@ -538,7 +509,7 @@ public class RoutePlanActivity extends BaseActivity implements
 	@Override
 	public void onGetDrivingRouteResult(DrivingRouteResult result) {
 		if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) {
-			Toast.makeText(RoutePlanActivity.this, "抱歉，未找到结果",
+			Toast.makeText(PassStartActivity.this, "抱歉，未找到结果",
 					Toast.LENGTH_SHORT).show();
 		}
 		if (result.error == SearchResult.ERRORNO.AMBIGUOUS_ROURE_ADDR) {
@@ -635,7 +606,6 @@ public class RoutePlanActivity extends BaseActivity implements
 		mMapView.onPause();
 
 		Log.v(TAG, "pause");
-		// stopService(intent_main_service);
 
 		super.onPause();
 	}
@@ -659,9 +629,29 @@ public class RoutePlanActivity extends BaseActivity implements
 	}
 
 	@Override
+	protected void onStart() {
+
+		// bind
+		Intent intent_voice_service = new Intent(this, VoiceService.class);
+		startService(intent_voice_service);
+		bindService(intent_voice_service, connection_voice, BIND_AUTO_CREATE);
+		Intent intent_path_service = new Intent(this,
+				PathOperationService.class);
+		startService(intent_path_service);
+		bindService(intent_path_service, connection_path, BIND_AUTO_CREATE);
+
+		// Intent intent_bluetooth_service = new Intent(this,
+		// BluetoothService.class);
+		//
+		// startService(intent_bluetooth_service);
+		// bindService(intent_bluetooth_service, connection_bluetooth,
+		// BIND_AUTO_CREATE);
+		super.onStart();
+	}
+
+	@Override
 	protected void onStop() {
 		// TODO Auto-generated method stub
-
 		Log.v(TAG, "stop");
 		super.onStop();
 	}
@@ -675,7 +665,6 @@ public class RoutePlanActivity extends BaseActivity implements
 		mLocClient.stop();
 		// 关闭定位图层
 		mBaidumap.setMyLocationEnabled(false);
-
 		Log.v(TAG, "destory");
 		mMapView.onDestroy();
 		mMapView = null;
@@ -748,26 +737,16 @@ public class RoutePlanActivity extends BaseActivity implements
 			// StartRead("请根据提示说出起点和终点", Config.ACK_SAY_START);
 			break;
 		case Config.ACK_SAY_START:
-			counter=1;
+			et = (EditText) findViewById(R.id.et_start);
 			StartRead("起点", Config.ACK_LISTEN_START);
 			break;
 		case Config.ACK_LISTEN_START:
 			StartListen(Config.ACK_SAY_END);
 			// StartListen(Config.ACK_START_SEND);
 			break;
-		case Config.ACK_VOICE_SERVICE:
-			if(counter==1){
-				editSt.setText((String) message.obj);
-				StartRead("终点", Config.ACK_LISTEN_END);			
-				counter=2;
-			} else if(counter==2){
-				editEn.setText((String) message.obj);
-				StartRoute();
-				counter=0;
-			}
-			break;
 		case Config.ACK_SAY_END:
-			editSt.setText((String) message.obj);
+			et.setText((String) message.obj);
+			et = (EditText) findViewById(R.id.et_end);
 			StartRead("终点", Config.ACK_LISTEN_END);
 			break;
 		case Config.ACK_LISTEN_END:
@@ -775,12 +754,14 @@ public class RoutePlanActivity extends BaseActivity implements
 			break;
 		case Config.ACK_START_ROUTE:
 			/* old */
-			editEn.setText((String) message.obj);
-			StartRoute();
+			// et.setText((String) message.obj);
+			// StartRoute();
 			/* new */
-			// path_binder.findPath(startpoint, (String) message.obj);
+			// path_binder.findPath("001", (String) message.obj);
+			path_binder.findPath("001", "D");
 			break;
 		case Config.ACK_ROUTE_RETURN:
+			// finish();
 			break;
 
 		case Config.SUCCESS:
@@ -807,6 +788,9 @@ public class RoutePlanActivity extends BaseActivity implements
 
 			StartRead("已到达终点", Config.ACK_NONE);
 			finish();
+			break;
+		case Config.NONEPLACE:
+			StartRead("没有找到地方", Config.ACK_NONE);
 			break;
 		default:
 			break;

@@ -13,7 +13,7 @@ import com.navi.client.Config;
 import com.navi.model.Path;
 
 public class PathOperationService extends Service {
-	Database db = Database.getInstance();
+	Database db;
 
 	// for all
 	Set<String> nodeID = new HashSet<String>();
@@ -28,7 +28,7 @@ public class PathOperationService extends Service {
 	Set<Node> outPath = new HashSet<Node>();
 	Map<String, Double> aboutStartLenMap = new HashMap<String, Double>();
 	Map<String, Double> aboutEndLenMap = new HashMap<String, Double>();
-	Map<String, String> aboutEndMap = new HashMap<String, String>();//建筑对应点
+	Map<String, String> aboutEndMap = new HashMap<String, String>();
 	List<String> endNodes = new ArrayList<String>();
 	// results
 	Map<String, String> path = new HashMap<String, String>();
@@ -45,9 +45,10 @@ public class PathOperationService extends Service {
 		inPath.add(start);
 		Iterator it = nodes.keySet().iterator();
 		while (it.hasNext()) {
-			if (!it.next().toString().equals(NodeID)) {
+			String tmpNodeID=it.next().toString();
+			if (!tmpNodeID.equals(NodeID)) {
 				Node outer = new Node();
-				outer.nid = it.next().toString();
+				outer.nid = tmpNodeID;
 				outer = nodes.get(outer.nid);
 				outPath.add(outer);
 				shortLenMap.put(outer.nid, 9999999.0);
@@ -58,6 +59,7 @@ public class PathOperationService extends Service {
 
 	// run when sys start
 	public void init() {
+		db = Database.getInstance(this);
 		db.setRoads();
 		nodeID = db.getNodes();
 		for (String NodeID : nodeID) {
@@ -133,6 +135,7 @@ public class PathOperationService extends Service {
 			return;
 		} else {
 			Path tmpPath = allPoints.get(curNodeID);
+			String aaa = tmpPath.getStreetID();
 			Road tmpRoad = roads.get(tmpPath.getStreetID());
 			aboutStartLenMap.put(
 					tmpRoad.start,
@@ -225,14 +228,7 @@ public class PathOperationService extends Service {
 			init();
 		}
 		
-		public void naviInfo(String startID,String baiduStr) {
-			//int baiduStr.lastIndexOf("步行至");
-			String endName=null;
-			findPath(startID,endName);
-		}
-		
 		public void findPath(String startID, String endName) {
-			
 			// 查找路径，返回下一步String
 			getAboutStartLen(startID);
 			getAboutEndLen(endName);

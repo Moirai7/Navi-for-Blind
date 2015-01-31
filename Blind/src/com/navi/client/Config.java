@@ -81,5 +81,11 @@ public interface Config {
 	public static final int ACK_BLUE_CON_SUCCESS = 127;
 
 	public static final int ACK_END_POINT = 128;
+
+	public static final int NONEPLACE = 129;
+	
+	public static final int ACK_VOICE_SERVICE = 130;
+
+	
 	
 }

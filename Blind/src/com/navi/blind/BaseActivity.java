@@ -3,6 +3,7 @@ package com.navi.blind;
 import java.util.LinkedList;
 
 import com.navi.client.Conmmunication;
+import com.navi.util.Database;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -18,6 +19,7 @@ public abstract class BaseActivity extends Activity {
 	// 将生成的Activity都放到LinkList集合中
 	protected static LinkedList<BaseActivity> queue = new LinkedList<BaseActivity>();
 	public static Conmmunication con;
+	public static Database db;
 
 	// 监听home键
 	HomeKeyEventBroadCastReceiver receiver;
@@ -34,7 +36,7 @@ public abstract class BaseActivity extends Activity {
 
 		// 监听home键
 		
-
+		
 		receiver = new HomeKeyEventBroadCastReceiver();
 		registerReceiver(receiver, new IntentFilter(
 				Intent.ACTION_CLOSE_SYSTEM_DIALOGS));

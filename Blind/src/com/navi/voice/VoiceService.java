@@ -215,9 +215,11 @@ public class VoiceService extends Service {
 				showTip(finalresult);
 
 				Message msg = Message.obtain();
-				msg.what = Config.ACK_SERVICE;
+				msg.what = CURRENT_ACK;
 				msg.obj = finalresult;
 				BaseActivity.sendMessage(msg);
+				
+				finalresult = "";
 			}
 
 		}
