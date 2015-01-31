@@ -6,10 +6,8 @@ import java.io.OutputStream;
 import java.util.Set;
 import java.util.UUID;
 
-import com.navi.blind.BaseActivity;
-import com.navi.client.Config;
 import android.annotation.SuppressLint;
-import android.app.Service;
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -17,13 +15,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Binder;
 import android.os.Build;
-import android.os.IBinder;
-import android.os.Message;
 import android.util.Log;
 
-public class BluetoothService extends Service {
+public abstract class Bluetooth {
 	private final static String TAG = "bluetooth lanlan:";
 	private final static String ADDRESS = "20:14:02:17:23:04";
 
@@ -38,6 +33,7 @@ public class BluetoothService extends Service {
 
 	static String BlueToothAddress = "null";
 	static ServerOrCilent serviceOrCilent = ServerOrCilent.NONE;
+	static boolean isOpen = false;
 
 	/* chatActivity.javaһЩ������������������� */
 	public static final String PROTOCOL_SCHEME_L2CAP = "btl2cap";
@@ -52,20 +48,12 @@ public class BluetoothService extends Service {
 	private BluetoothAdapter mBluetoothAdapter = BluetoothAdapter
 			.getDefaultAdapter();
 	private Context context;
-
-	public BluetoothService() {
-
-	}
-
-	public class MyBinder extends Binder {
-		public void startService(Context context) {
-			init(context);
-		}
-	}
-
-	// ��ʼ������
-	public void init(Context context) {
+	
+	public Bluetooth(Context context){
 		this.context = context;
+	}
+	// ��ʼ������
+	public void init() {
 		// Register for broadcasts when a device is discovered
 		IntentFilter discoveryFilter = new IntentFilter(
 				BluetoothDevice.ACTION_FOUND);
@@ -91,6 +79,7 @@ public class BluetoothService extends Service {
 							.getRemoteDevice(BlueToothAddress);
 					clientConnectThread = new clientThread();
 					clientConnectThread.start();
+					isOpen = true;
 					break;
 				}
 			}
@@ -124,6 +113,7 @@ public class BluetoothService extends Service {
 								.getRemoteDevice(BlueToothAddress);
 						clientConnectThread = new clientThread();
 						clientConnectThread.start();
+						isOpen = true;
 					}
 				}
 				// When discovery is finished, change the Activity title
@@ -151,12 +141,9 @@ public class BluetoothService extends Service {
 				} catch (Exception e) {
 					Log.e("", "Error creating socket");
 				}
-				Log.i(TAG, "connect to bluetooth");
+				Log.i(TAG, "��ʼ��");
 				socket.connect();
-				Log.i(TAG, "connect to bluetooth");
-				Message msg = Message.obtain();
-				msg.what = Config.ACK_BLUE_CON_SUCCESS;
-				BaseActivity.sendMessage(msg);
+				Log.i(TAG, "������");
 				// �����������
 				mreadThread = new readThread();
 				mreadThread.start();
@@ -181,9 +168,6 @@ public class BluetoothService extends Service {
 					Log.e(TAG, "Connected");
 				} catch (Exception e1) {
 					e1.printStackTrace();
-					Message msg = Message.obtain();
-					msg.what = Config.FAIl;
-					BaseActivity.sendMessage(msg);
 				}
 			}
 			// }
@@ -194,10 +178,8 @@ public class BluetoothService extends Service {
 	public class readThread extends Thread {
 		public void run() {
 			byte[] buffer = new byte[1024];
-			byte[] info_temp = new byte[0];
 			int bytes;
 			InputStream mmInStream = null;
-			int tempBytes = -1;
 			// ���ڶ�ȡͼƬ
 			try {
 				mmInStream = socket.getInputStream();
@@ -208,47 +190,7 @@ public class BluetoothService extends Service {
 			while (true) {
 				try {
 					if ((bytes = mmInStream.read(buffer)) > 0) {
-						for (int i = 0; i < bytes; i++) {
-							String file_string = "";
-							if (buffer[i] == 0x40) {// 开始
-								Log.i(TAG, "检测到文件开始");
-								info_temp = new byte[0];
-								tempBytes = 0;
-							}
-							if (tempBytes != -1 && buffer[i] != 0x0d) {
-								byte[] temp = new byte[tempBytes + 1];
-								System.arraycopy(info_temp, 0, temp, 0,
-										info_temp.length);
-								System.arraycopy(buffer, i, temp,
-										info_temp.length, 1);
-								info_temp = temp;
-								tempBytes++;
-							} else if (tempBytes != -1 && buffer[i] == 0x0d) {
-								byte[] temp = new byte[tempBytes + 1];
-								System.arraycopy(info_temp, 0, temp, 0,
-										info_temp.length);
-								System.arraycopy(buffer, i, temp,
-										info_temp.length, 1);
-								info_temp = temp;
-								
-								int info_len = info_temp[4];
-								byte[] info = new byte[info_len];
-								System.arraycopy(info_temp, 5, info, 0,
-										info_len);
-								
-								Message msg = Message.obtain();
-								msg.what = Config.ACK_BLUE_SUCCESS;
-								msg.arg1 = info_len;
-								msg.obj = info;
-								BaseActivity.sendMessage(msg);
-								tempBytes = -1;
-								file_string = "";
-								for (int k = 0; k < info_len; k++) {
-									file_string += info[k]+",";
-								}
-								Log.i(Config.TAG, file_string);
-							}
-						}
+						proc(bytes,buffer);
 					}
 				} catch (IOException e) {
 					try {
@@ -261,6 +203,8 @@ public class BluetoothService extends Service {
 			}
 		}
 	}
+	
+	public abstract void proc(int bytes, byte[] buffer) ;
 
 	public void shutdownClient() {
 		new Thread() {
@@ -298,10 +242,4 @@ public class BluetoothService extends Service {
 		}
 	}
 
-	private MyBinder mBinder = new MyBinder();
-
-	@Override
-	public IBinder onBind(Intent arg0) {
-		return mBinder;
-	}
 }
