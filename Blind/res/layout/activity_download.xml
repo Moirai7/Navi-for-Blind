@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <Button
+        android:id="@+id/download"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="download" />
+
+    <EditText
+        android:id="@+id/pointid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10" >
+
+        <requestFocus />
+    </EditText>
+
+    <Button
+        android:id="@+id/submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Submit" />
+
+    <Button
+        android:id="@+id/submit_local"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="submit_local" />
+
+    <Button
+        android:id="@+id/read_local"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="read_local" />
+
+</LinearLayout>

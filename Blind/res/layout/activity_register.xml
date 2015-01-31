@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent" android:layout_height="match_parent"
+	android:orientation="vertical" android:background="@drawable/ground_overlay">
+
+	<LinearLayout android:id="@+id/layout1"
+		android:layout_width="fill_parent" android:layout_height="wrap_content">
+		<TextView android:id="@+id/textview1" android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:gravity="center"
+			android:text="用户注册" android:textSize="20.0px" />
+	</LinearLayout>
+	<LinearLayout android:id="@+id/layout2"
+		android:layout_height="wrap_content" android:layout_width="fill_parent"
+		android:gravity="center">
+		<TextView android:id="@+id/user" android:text="用户名："
+			android:layout_width="70.0px" android:layout_height="wrap_content" />
+		<EditText android:id="@+id/edit_username_reg" android:layout_width="160.0px"
+			android:layout_height="wrap_content" />
+	</LinearLayout>
+	<LinearLayout android:id="@+id/layout3"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:orientation="horizontal" android:gravity="center">
+		<TextView android:id="@+id/pwd1" android:layout_width="70.0px"
+			android:layout_height="wrap_content" android:text="密码:" />
+		<EditText android:id="@+id/edit_password1_reg" android:layout_width="160.0px"
+			android:layout_height="wrap_content" android:password="true" />
+	</LinearLayout>
+	<LinearLayout android:id="@+id/layout4"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:orientation="horizontal" android:gravity="center">
+		<TextView android:id="@+id/pwd2" android:layout_width="70.0px"
+			android:layout_height="wrap_content" android:text="重复密码：" />
+		<EditText android:id="@+id/edit_password2_reg" android:layout_width="160.0px"
+			android:layout_height="wrap_content" android:password="true" />
+	</LinearLayout>
+	<LinearLayout android:id="@+id/layout5"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:orientation="horizontal" android:gravity="center">
+		<Button android:id="@+id/reset" android:layout_width="120.0px"
+			android:layout_height="wrap_content" android:text="重置" />
+		<Button android:id="@+id/bt_register" android:layout_width="120.0px"
+			android:layout_height="wrap_content" android:text="注册" />
+	</LinearLayout>
+</LinearLayout>
