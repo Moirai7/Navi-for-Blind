@@ -56,11 +56,15 @@ public class PathOperationService extends Service {
 		}
 		shortLenMap.put(NodeID, Len);
 	}
+	public void downloadInit(){
+		db = Database.getInstance(this);
+		db.setRoads();
+		db.setPlace();
+	}
 
 	// run when sys start
 	public void init() {
 		db = Database.getInstance(this);
-		db.setRoads();
 		nodeID = db.getNodes();
 		for (String NodeID : nodeID) {
 			Node node = new Node();
@@ -223,6 +227,10 @@ public class PathOperationService extends Service {
 	}
 
 	public class MyBinder extends Binder {
+		
+		public void downloadInitService(){
+			downloadInit();
+		}
 		
 		public void initStartService(){
 			init();
