@@ -36,12 +36,16 @@ public class PathOperationService extends Service {
 	String finalEndNode;
 	String finalStartNode;
 	List<String> shortestNodes = new ArrayList<String>();
-
-	// run when sys start
-	public void init() {
+	
+	public void downloadInit(){
 		db = Database.getInstance(this);
 		db.setPlace();
 		db.setRoads();
+	}
+	
+	// run when sys start
+	public void init() {
+		db = Database.getInstance(this);
 		nodeID = db.getNodes();
 		for (String NodeID : nodeID) {
 			Node node = new Node();
@@ -91,7 +95,7 @@ public class PathOperationService extends Service {
 		}
 		shortLenMap.put(NodeID, Len);
 	}
-
+	
 	// (!)all path
 	public void getFindPath(String startNode, Node endNode, double len) {
 		Map<String, String> tmpPath = new HashMap<String, String>();
@@ -243,6 +247,10 @@ public class PathOperationService extends Service {
 
 		public void initStartService() {
 			init();
+		}
+		
+		public void downloadInitService() {
+			downloadInit();
 		}
 
 		public void findPath(String startID, String endName) {
