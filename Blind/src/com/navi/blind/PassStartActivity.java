@@ -188,7 +188,7 @@ public class PassStartActivity extends BaseActivity implements
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			bluetooth_binder = (BluetoothService.MyBinder) service;
-			bluetooth_binder.startService(context);
+			//bluetooth_binder.startService(context);
 			bluetooth_flag = true;
 			
 			Message msg = Message.obtain();
@@ -780,6 +780,7 @@ public class PassStartActivity extends BaseActivity implements
 			/* new */
 			// path_binder.findPath("001", (String) message.obj);
 			path_binder.findPath("001", "D");
+			bluetooth_binder.startTimer();
 			break;
 		case Config.ACK_ROUTE_RETURN:
 			// finish();
