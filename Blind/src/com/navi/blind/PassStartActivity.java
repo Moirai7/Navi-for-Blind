@@ -108,7 +108,7 @@ public class PassStartActivity extends BaseActivity implements
 	public static boolean flag_tts = false;
 	public static boolean isFirstLoc = true;
 
-	public static boolean voice_flag, path_flag = false;
+	public static boolean voice_flag, path_flag,bluetooth_flag = false;
 
 	// 定位
 	LocationClient mLocClient;
@@ -148,9 +148,12 @@ public class PassStartActivity extends BaseActivity implements
 // 			path_binder.CheckPoint("012");//偏离
 // 			path_binder.CheckPoint("011");//到了
 			path_flag = true;
+			Message msg = Message.obtain();
+			msg.what = Config.ACK_NONE;
+			BaseActivity.sendMessage(msg);
 			Log.v("tag", "bind");
-			if (voice_flag)
-				StartRead("请根据提示说出终点", Config.ACK_SAY_END);
+			//if (voice_flag)
+				//StartRead("请根据提示说出终点", Config.ACK_SAY_END);
 		}
 	};
 
@@ -166,9 +169,13 @@ public class PassStartActivity extends BaseActivity implements
 			voice_binder = (VoiceService.MyBinder) service;
 			voice_flag = true;
 			Log.v("tag", "bind");
+			
+			Message msg = Message.obtain();
+			msg.what = Config.ACK_NONE;
+			BaseActivity.sendMessage(msg);
 
-			if (path_flag)
-				StartRead("请根据提示说出终点", Config.ACK_SAY_END);
+			//if (path_flag)
+				//StartRead("请根据提示说出终点", Config.ACK_SAY_END);
 		}
 	};
 
@@ -182,6 +189,12 @@ public class PassStartActivity extends BaseActivity implements
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			bluetooth_binder = (BluetoothService.MyBinder) service;
 			bluetooth_binder.startService(context);
+			bluetooth_flag = true;
+			
+			Message msg = Message.obtain();
+			msg.what = Config.ACK_NONE;
+			BaseActivity.sendMessage(msg);
+			
 
 			Log.v(Config.TAG, "bind");
 		}
@@ -640,12 +653,12 @@ public class PassStartActivity extends BaseActivity implements
 		startService(intent_path_service);
 		bindService(intent_path_service, connection_path, BIND_AUTO_CREATE);
 
-		// Intent intent_bluetooth_service = new Intent(this,
-		// BluetoothService.class);
-		//
-		// startService(intent_bluetooth_service);
-		// bindService(intent_bluetooth_service, connection_bluetooth,
-		// BIND_AUTO_CREATE);
+		 Intent intent_bluetooth_service = new Intent(this,
+		 BluetoothService.class);
+		
+		 startService(intent_bluetooth_service);
+		 bindService(intent_bluetooth_service, connection_bluetooth,
+		 BIND_AUTO_CREATE);
 		super.onStart();
 	}
 
@@ -732,6 +745,14 @@ public class PassStartActivity extends BaseActivity implements
 
 	@Override
 	public void processMessage(Message message) {
+		
+		if(voice_flag && bluetooth_flag && path_flag){
+			StartRead("请根据提示说出终点", Config.ACK_SAY_END);
+			voice_flag = false;
+			bluetooth_flag = false;
+			path_flag = false;
+		}
+		
 		switch (message.what) {
 		case Config.ACK_OPEN_ROUTE:
 			// StartRead("请根据提示说出起点和终点", Config.ACK_SAY_START);
@@ -773,8 +794,9 @@ public class PassStartActivity extends BaseActivity implements
 			break;
 		case Config.ACK_BLUE_SUCCESS:
 			// int bytes = message.arg1;
-			byte[] buffer = (byte[]) message.obj;
-			startpoint = new String(buffer);
+			//byte[] buffer = (byte[]) message.obj;
+			//startpoint = new String(buffer);
+			startpoint = (String) message.obj;
 			if (!checkpoint) {
 				StartRead("请根据提示说出终点", Config.ACK_SAY_END);
 			} else {
