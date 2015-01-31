@@ -16,7 +16,7 @@
         android:theme="@style/AppTheme" >
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="8Bi6CbGsqfosVpGtpGek2Rdk" />
+            android:value="WUhMzLnWEpBoZuswVTSsmNB7" />
 
          <activity
             android:name="NaviActivity"

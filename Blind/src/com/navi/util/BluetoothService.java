@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.UUID;
 
 import com.navi.blind.BaseActivity;
@@ -54,7 +52,6 @@ public class BluetoothService extends Service {
 	private BluetoothAdapter mBluetoothAdapter = BluetoothAdapter
 			.getDefaultAdapter();
 	private Context context;
-	private int i = 1;
 
 	public BluetoothService() {
 
@@ -68,68 +65,38 @@ public class BluetoothService extends Service {
 
 	// ��ʼ������
 	public void init(Context context) {
-		Timer mTimer = null;
-		TimerTask mTimerTask = null;  
-		if (mTimer == null) {  
-            mTimer = new Timer();  
-        }  
-  
-        if (mTimerTask == null) {  
-            mTimerTask = new TimerTask() {  
-                @Override  
-                public void run() {  
-                    do {  
-                        try {  
-                            Log.i(TAG, "sleep(1000)...");  
-                            Thread.sleep(30000);  
-                        } catch (InterruptedException e) {  
-                        }     
-                    } while (true);   
-                }  
-            };  
-        }  
-  
-        if(mTimer != null && mTimerTask != null )  
-            mTimer.schedule(mTimerTask, 300000, 300000);  
-        String path[]={"001","002","003","004","005","006","007","008","009","010","011","012","013","014","015","016"};
-        Message msg = Message.obtain();
-		msg.what = Config.ACK_BLUE_SUCCESS;
-		msg.arg1 = 3;
-		msg.obj = path[i++];
-		if(i>15) i=0;
-		BaseActivity.sendMessage(msg);
-//		this.context = context;
-//		// Register for broadcasts when a device is discovered
-//		IntentFilter discoveryFilter = new IntentFilter(
-//				BluetoothDevice.ACTION_FOUND);
-//		context.registerReceiver(mReceiver, discoveryFilter);
-//
-//		// Register for broadcasts when discovery has finished
-//		IntentFilter foundFilter = new IntentFilter(
-//				BluetoothDevice.ACTION_FOUND);
-//		context.registerReceiver(mReceiver, foundFilter);
-//
-//		// Get a set of currently paired devices
-//		Set<BluetoothDevice> pairedDevices = mBtAdapter.getBondedDevices();
-//
-//		// If there are paired devices, add each one to the ArrayAdapter
-//		if (pairedDevices.size() > 0) {
-//			for (BluetoothDevice device : pairedDevices) {
-//				if (device.getAddress().equals(ADDRESS)) {
-//					BlueToothAddress = ADDRESS;
-//					mBtAdapter.cancelDiscovery();
-//					serviceOrCilent = ServerOrCilent.CILENT;
-//
-//					this.device = mBluetoothAdapter
-//							.getRemoteDevice(BlueToothAddress);
-//					clientConnectThread = new clientThread();
-//					clientConnectThread.start();
-//					break;
-//				}
-//			}
-//		} else {
-//			mBtAdapter.startDiscovery();
-//		}
+		this.context = context;
+		// Register for broadcasts when a device is discovered
+		IntentFilter discoveryFilter = new IntentFilter(
+				BluetoothDevice.ACTION_FOUND);
+		context.registerReceiver(mReceiver, discoveryFilter);
+
+		// Register for broadcasts when discovery has finished
+		IntentFilter foundFilter = new IntentFilter(
+				BluetoothDevice.ACTION_FOUND);
+		context.registerReceiver(mReceiver, foundFilter);
+
+		// Get a set of currently paired devices
+		Set<BluetoothDevice> pairedDevices = mBtAdapter.getBondedDevices();
+
+		// If there are paired devices, add each one to the ArrayAdapter
+		if (pairedDevices.size() > 0) {
+			for (BluetoothDevice device : pairedDevices) {
+				if (device.getAddress().equals(ADDRESS)) {
+					BlueToothAddress = ADDRESS;
+					mBtAdapter.cancelDiscovery();
+					serviceOrCilent = ServerOrCilent.CILENT;
+
+					this.device = mBluetoothAdapter
+							.getRemoteDevice(BlueToothAddress);
+					clientConnectThread = new clientThread();
+					clientConnectThread.start();
+					break;
+				}
+			}
+		} else {
+			mBtAdapter.startDiscovery();
+		}
 	}
 
 	// ��ʼ������

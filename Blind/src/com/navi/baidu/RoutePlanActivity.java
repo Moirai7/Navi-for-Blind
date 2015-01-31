@@ -321,7 +321,7 @@ public class RoutePlanActivity extends BaseActivity implements
 
 		String endNode = editEn.getText().toString();
 
-		startNode = "西直门";
+		startNode = "北京交通大学";
 		endNode = "东直门";
 
 		// while(endNode == null){
