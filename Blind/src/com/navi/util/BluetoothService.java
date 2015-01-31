@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 
 import com.navi.blind.BaseActivity;
@@ -52,6 +54,7 @@ public class BluetoothService extends Service {
 	private BluetoothAdapter mBluetoothAdapter = BluetoothAdapter
 			.getDefaultAdapter();
 	private Context context;
+	private int i = 1;
 
 	public BluetoothService() {
 
@@ -60,6 +63,38 @@ public class BluetoothService extends Service {
 	public class MyBinder extends Binder {
 		public void startService(Context context) {
 			init(context);
+		}
+		public void startTimer(){
+			Timer mTimer = null;
+			TimerTask mTimerTask = null;  
+			if (mTimer == null) {  
+	            mTimer = new Timer();  
+	        }  
+	  
+	        if (mTimerTask == null) {  
+	            mTimerTask = new TimerTask() {  
+	                @Override  
+	                public void run() {  
+	                    do {  
+	                        try {  
+	                            Log.i(TAG, "sleep(1000)...");  
+	                            Thread.sleep(30000);  
+	                        } catch (InterruptedException e) {  
+	                        }     
+	                    } while (true);   
+	                }  
+	            };  
+	        }  
+	  
+	        if(mTimer != null && mTimerTask != null )  
+	            mTimer.schedule(mTimerTask, 300000, 300000);  
+	        String path[]={"001","002","003","004","005","006","007","008","009","010","011","012","013","014","015","016"};
+	        Message msg = Message.obtain();
+			msg.what = Config.ACK_BLUE_SUCCESS;
+			msg.arg1 = 3;
+			msg.obj = path[i++];
+			if(i>15) i=0;
+			BaseActivity.sendMessage(msg);
 		}
 	}
 
