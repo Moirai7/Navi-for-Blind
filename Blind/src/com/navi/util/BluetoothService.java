@@ -70,15 +70,22 @@ public class BluetoothService extends Service {
 			if (mTimer == null) {  
 	            mTimer = new Timer();  
 	        }  
-	  
+			final String path[]={"001","002","003","004","005","006","007","008","009","010","011","012","013","014","015","016"};
+	        
 	        if (mTimerTask == null) {  
 	            mTimerTask = new TimerTask() {  
 	                @Override  
 	                public void run() {  
 	                    do {  
 	                        try {  
-	                            Log.i(TAG, "sleep(1000)...");  
-	                            Thread.sleep(30000);  
+	                            Log.i(TAG, "sleep(10000)...");  
+	                            Thread.sleep(10000);  
+	                            Message msg = Message.obtain();
+	                			msg.what = Config.ACK_BLUE_SUCCESS;
+	                			msg.arg1 = 3;
+	                			msg.obj = path[i++];
+	                			if(i>15) i=0;
+	                			BaseActivity.sendMessage(msg);
 	                        } catch (InterruptedException e) {  
 	                        }     
 	                    } while (true);   
@@ -87,14 +94,8 @@ public class BluetoothService extends Service {
 	        }  
 	  
 	        if(mTimer != null && mTimerTask != null )  
-	            mTimer.schedule(mTimerTask, 300000, 300000);  
-	        String path[]={"001","002","003","004","005","006","007","008","009","010","011","012","013","014","015","016"};
-	        Message msg = Message.obtain();
-			msg.what = Config.ACK_BLUE_SUCCESS;
-			msg.arg1 = 3;
-			msg.obj = path[i++];
-			if(i>15) i=0;
-			BaseActivity.sendMessage(msg);
+	            mTimer.schedule(mTimerTask, 10000, 10000);  
+	       
 		}
 	}
 

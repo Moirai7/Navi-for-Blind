@@ -239,7 +239,7 @@ public class PassStartActivity extends BaseActivity implements
 
 					if (total < 100) {
 						StopListen();
-						StartRead("请根据提示说出起点和终点", Config.ACK_SAY_START);
+						//StartRead("请根据提示说出起点和终点", Config.ACK_SAY_START);
 					}
 
 					return true;
@@ -729,7 +729,7 @@ public class PassStartActivity extends BaseActivity implements
 
 			if (total < 100) {
 				StopListen();
-				StartRead("请根据提示说出起点和终点", Config.ACK_SAY_START);
+				//StartRead("请根据提示说出起点和终点", Config.ACK_SAY_START);
 			}
 			break;
 		case MotionEvent.ACTION_CANCEL:
@@ -766,9 +766,12 @@ public class PassStartActivity extends BaseActivity implements
 			// StartListen(Config.ACK_START_SEND);
 			break;
 		case Config.ACK_SAY_END:
-			et.setText((String) message.obj);
-			et = (EditText) findViewById(R.id.et_end);
-			StartRead("终点", Config.ACK_LISTEN_END);
+			path_binder.findPath("001", "D");
+			bluetooth_binder.startTimer();
+//			et.setText((String) message.obj);
+//			et = (EditText) findViewById(R.id.et_end);
+//			
+//			StartRead("", Config.ACK_LISTEN_END);
 			break;
 		case Config.ACK_LISTEN_END:
 			StartListen(Config.ACK_START_ROUTE);
@@ -779,7 +782,7 @@ public class PassStartActivity extends BaseActivity implements
 			// StartRoute();
 			/* new */
 			// path_binder.findPath("001", (String) message.obj);
-			path_binder.findPath("001", "D");
+			path_binder.findPath("001", (String) message.obj);
 			bluetooth_binder.startTimer();
 			break;
 		case Config.ACK_ROUTE_RETURN:
@@ -792,17 +795,19 @@ public class PassStartActivity extends BaseActivity implements
 			break;
 		case Config.FAIl:
 			StartRead("失败", Config.ACK_NONE);
+			path_binder.findPath(startpoint, "D");
 			break;
 		case Config.ACK_BLUE_SUCCESS:
 			// int bytes = message.arg1;
 			//byte[] buffer = (byte[]) message.obj;
 			//startpoint = new String(buffer);
 			startpoint = (String) message.obj;
-			if (!checkpoint) {
-				StartRead("请根据提示说出终点", Config.ACK_SAY_END);
-			} else {
-				path_binder.CheckPoint(startpoint);
-			}
+			path_binder.CheckPoint(startpoint);
+//			if (!checkpoint) {
+//				StartRead("请根据提示说出终点", Config.ACK_SAY_END);
+//			} else {
+//				path_binder.CheckPoint(startpoint);
+//			}
 			break;
 		case Config.ACK_BLUE_CON_SUCCESS:
 			Log.i(Config.TAG, "bluetooth 连接成功");
@@ -821,7 +826,7 @@ public class PassStartActivity extends BaseActivity implements
 		}
 
 		if (flag_iat && flag_tts) {
-			StartRead("请根据提示说出起点和终点", Config.ACK_SAY_START);
+			//StartRead("请根据提示说出起点和终点", Config.ACK_SAY_START);
 			flag_iat = false;
 
 		}
