@@ -202,7 +202,8 @@ public class VoiceService extends Service {
 
 		@Override
 		public void onVolumeChanged(int v) throws RemoteException {
-			showTip("onVolumeChanged：" + v);
+			//showTip("onVolumeChanged：" + v);
+			Log.d(TAG, "onVolumeChanged：" + v);
 		}
 
 		@Override
@@ -226,17 +227,20 @@ public class VoiceService extends Service {
 
 		@Override
 		public void onError(int errorCode) throws RemoteException {
-			showTip("onError Code：" + errorCode);
+			//showTip("onError Code：" + errorCode);
+			Log.d(TAG, "onError Code：" + errorCode);
 		}
 
 		@Override
 		public void onEndOfSpeech() throws RemoteException {
-			showTip("onEndOfSpeech");
+			//showTip("onEndOfSpeech");
+			Log.d(TAG, "onEndOfSpeech.");
 		}
 
 		@Override
 		public void onBeginOfSpeech() throws RemoteException {
-			showTip("onBeginOfSpeech");
+			Log.d(TAG, "onBeginOfSpeech.");
+			//showTip("onBeginOfSpeech");
 		}
 	};
 
@@ -295,8 +299,8 @@ public class VoiceService extends Service {
 
 		@Override
 		public void onSpeakProgress(int progress) throws RemoteException {
-			Log.d(TAG, "onSpeakProgress :" + progress);
-			showTip("onSpeakProgress :" + progress);
+		//	Log.d(TAG, "onSpeakProgress :" + progress);
+		//	showTip("onSpeakProgress :" + progress);
 		}
 
 		@Override

@@ -648,16 +648,6 @@ public class RoutePlanActivity extends BaseActivity implements
 		super.onResume();
 	}
 
-	private void showTip(final String str) {
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				mToast.setText(str);
-				mToast.show();
-			}
-		});
-	}
-
 	@Override
 	protected void onStop() {
 		// TODO Auto-generated method stub

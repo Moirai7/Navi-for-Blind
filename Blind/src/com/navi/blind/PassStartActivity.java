@@ -138,15 +138,6 @@ public class PassStartActivity extends BaseActivity implements
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			path_binder = (PathOperationService.MyBinder) service;
 			path_binder.initStartService();
-			//test
-//			path_binder.findPath("006", "B");// 起始在同一条路
-//			path_binder.findPath("001", "S");// 没有这个地方呢
-//			path_binder.findPath("002", "B");//只差一条路
-//			path_binder.findPath("001", "D");//正常
-// 			path_binder.CheckPoint("002");//继续前进
-// 			path_binder.CheckPoint("004");//请向007走
-// 			path_binder.CheckPoint("012");//偏离
-// 			path_binder.CheckPoint("011");//到了
 			path_flag = true;
 			Message msg = Message.obtain();
 			msg.what = Config.ACK_NONE;
@@ -188,6 +179,7 @@ public class PassStartActivity extends BaseActivity implements
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			bluetooth_binder = (BluetoothService.MyBinder) service;
+			//TODO 蓝牙初始化方法
 			//bluetooth_binder.startService(context);
 			bluetooth_flag = true;
 			
@@ -631,16 +623,6 @@ public class PassStartActivity extends BaseActivity implements
 		super.onResume();
 	}
 
-	private void showTip(final String str) {
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				mToast.setText(str);
-				mToast.show();
-			}
-		});
-	}
-
 	@Override
 	protected void onStart() {
 
@@ -653,12 +635,11 @@ public class PassStartActivity extends BaseActivity implements
 		startService(intent_path_service);
 		bindService(intent_path_service, connection_path, BIND_AUTO_CREATE);
 
-		 Intent intent_bluetooth_service = new Intent(this,
-		 BluetoothService.class);
-		
-		 startService(intent_bluetooth_service);
-		 bindService(intent_bluetooth_service, connection_bluetooth,
-		 BIND_AUTO_CREATE);
+		Intent intent_bluetooth_service = new Intent(this,
+				BluetoothService.class);
+		startService(intent_bluetooth_service);
+		bindService(intent_bluetooth_service, connection_bluetooth,
+				BIND_AUTO_CREATE);
 		super.onStart();
 	}
 
@@ -755,7 +736,7 @@ public class PassStartActivity extends BaseActivity implements
 		
 		switch (message.what) {
 		case Config.ACK_OPEN_ROUTE:
-			// StartRead("请根据提示说出起点和终点", Config.ACK_SAY_START);
+			StartRead("请根据提示说出起点和终点", Config.ACK_SAY_START);
 			break;
 		case Config.ACK_SAY_START:
 			et = (EditText) findViewById(R.id.et_start);
@@ -763,15 +744,12 @@ public class PassStartActivity extends BaseActivity implements
 			break;
 		case Config.ACK_LISTEN_START:
 			StartListen(Config.ACK_SAY_END);
-			// StartListen(Config.ACK_START_SEND);
 			break;
 		case Config.ACK_SAY_END:
-			path_binder.findPath("001", "D");
-			bluetooth_binder.startTimer();
-//			et.setText((String) message.obj);
-//			et = (EditText) findViewById(R.id.et_end);
-//			
-//			StartRead("", Config.ACK_LISTEN_END);
+			et.setText((String) message.obj);
+			et = (EditText) findViewById(R.id.et_end);
+			
+			StartRead("终点", Config.ACK_LISTEN_END);
 			break;
 		case Config.ACK_LISTEN_END:
 			StartListen(Config.ACK_START_ROUTE);
@@ -783,6 +761,7 @@ public class PassStartActivity extends BaseActivity implements
 			/* new */
 			// path_binder.findPath("001", (String) message.obj);
 			path_binder.findPath("001", (String) message.obj);
+			//TODO 蓝牙测试方法
 			bluetooth_binder.startTimer();
 			break;
 		case Config.ACK_ROUTE_RETURN:
@@ -798,11 +777,11 @@ public class PassStartActivity extends BaseActivity implements
 			path_binder.findPath(startpoint, "D");
 			break;
 		case Config.ACK_BLUE_SUCCESS:
-			// int bytes = message.arg1;
-			//byte[] buffer = (byte[]) message.obj;
-			//startpoint = new String(buffer);
 			startpoint = (String) message.obj;
+			//TODO 蓝牙测试方法
 			path_binder.CheckPoint(startpoint);
+			//TODO 蓝牙正式方法
+//			checkpoint=true;
 //			if (!checkpoint) {
 //				StartRead("请根据提示说出终点", Config.ACK_SAY_END);
 //			} else {
@@ -826,7 +805,7 @@ public class PassStartActivity extends BaseActivity implements
 		}
 
 		if (flag_iat && flag_tts) {
-			//StartRead("请根据提示说出起点和终点", Config.ACK_SAY_START);
+			StartRead("请根据提示说出起点和终点", Config.ACK_SAY_START);
 			flag_iat = false;
 
 		}
