@@ -85,6 +85,14 @@ public interface Config {
 	public static final int NONEPLACE = 129;
 	
 	public static final int ACK_VOICE_SERVICE = 130;
+	
+	public static final int ACK_FINDPATH_SUCCESS = 131;
+	
+	public static final int ACK_CHECKPOINT_FAIL = 132;
+	
+	public static final int ACK_FINDPATH_FAIL = 133;
+	
+	public static final int ACK_BLUETOOTH_FAIL = 134;
 
 	
 	

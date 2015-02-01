@@ -119,7 +119,7 @@ public class RoutePlanActivity extends BaseActivity implements
 	public static boolean flag_tts = false;
 	public static boolean isFirstLoc = true;
 
-	public static boolean path_flag, voice_flag = false;
+	public static boolean path_flag, voice_flag,bluetooth_flag = false;
 
 	// 定位
 	LocationClient mLocClient;
@@ -133,7 +133,7 @@ public class RoutePlanActivity extends BaseActivity implements
 
 	private Context context = this;
 
-	private String startpoint;
+	private String startpoint = "001";
 	private boolean checkpoint = false;
 
 	private Intent intent_path, intent_bluetooth, intent_voice_service;
@@ -151,7 +151,11 @@ public class RoutePlanActivity extends BaseActivity implements
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			voice_binder = (VoiceService.MyBinder) service;
 			voice_flag = true;
-			Log.v("tag", "bind");
+			Log.v("tag", "voice bind");
+			
+			Message msg = Message.obtain();
+			msg.what = Config.ACK_NONE;
+			BaseActivity.sendMessage(msg);
 
 			//if (path_flag)
 			//StartRead("请根据提示说出起点和终点", Config.ACK_SAY_START);
@@ -168,8 +172,13 @@ public class RoutePlanActivity extends BaseActivity implements
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			path_binder = (PathOperationService.MyBinder) service;
+			path_binder.initStartService();
 			path_flag = true;
-			Log.v("tag", "bind");
+			Log.v("tag", "path bind");
+			
+			Message msg = Message.obtain();
+			msg.what = Config.ACK_NONE;
+			BaseActivity.sendMessage(msg);
 			//StartRead("请根据提示说出起点和终点", Config.ACK_SAY_START);
 			// StartRead("请根据提示说出终点", Config.ACK_SAY_END);
 		}
@@ -184,11 +193,19 @@ public class RoutePlanActivity extends BaseActivity implements
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			bluetooth_binder = (BluetoothService.MyBinder) service;
-			bluetooth_binder.startService(context);
-
-			Log.v(Config.TAG, "bind");
+			//TODO 蓝牙初始化方法
+			//bluetooth_binder.startService(context);
+			bluetooth_flag = true;
+			
+			Message msg = Message.obtain();
+			msg.what = Config.ACK_NONE;
+			BaseActivity.sendMessage(msg);
+			
+			Log.v(Config.TAG, "bluetooth bind");
 		}
 	};
+	private String startNode;
+	private String endNode;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -277,7 +294,7 @@ public class RoutePlanActivity extends BaseActivity implements
 
 		// myBinder = app.getBinder();
 
-		 StartRoute();
+		// StartRoute();
 
 	}
 
@@ -293,12 +310,11 @@ public class RoutePlanActivity extends BaseActivity implements
 		startService(intent_voice_service);
 		bindService(intent_voice_service, connection_voice, BIND_AUTO_CREATE);
 
-		// Intent intent_bluetooth_service = new Intent(this,
-		// PathOperationService.class);
-		//
-		// startService(intent_bluetooth_service);
-		// bindService(intent_bluetooth_service, connection_bluetooth,
-		// BIND_AUTO_CREATE);
+		Intent intent_bluetooth_service = new Intent(this,
+				BluetoothService.class);
+		startService(intent_bluetooth_service);
+		bindService(intent_bluetooth_service, connection_bluetooth,
+				BIND_AUTO_CREATE);
 		super.onStart();
 
 	}
@@ -317,9 +333,9 @@ public class RoutePlanActivity extends BaseActivity implements
 		mBtnNext.setVisibility(View.INVISIBLE);
 		mBaidumap.clear();
 
-		String startNode = editSt.getText().toString();
+		//String startNode = editSt.getText().toString();
 
-		String endNode = editEn.getText().toString();
+		//String endNode = editEn.getText().toString();
 
 		startNode = "北京交通大学";
 		endNode = "东直门";
@@ -519,11 +535,23 @@ public class RoutePlanActivity extends BaseActivity implements
 						.getEntrace().getLocation();
 				routeTitle = ((TransitRouteLine.TransitStep) step)
 						.getInstructions();
+				
+				String start = route.getStarting().getTitle();
+				String endd = route.getTerminal().getTitle();
+				String end = ((TransitRouteLine.TransitStep) step).getExit().getTitle();
+				
+				String endpoint = routeTitle.substring(routeTitle.indexOf("到达")+2, routeTitle.length());
+				
+				if(routeTitle.indexOf("步行")>=0 && nodeIndex==0){
+					// 调用算路
+					StartRead("正在计算步行路线",Config.ACK_NONE);
+					path_binder.findPath(startpoint, "A");
+					break;
+				}
 
 				location += routeTitle;
 				
-				String start = route.getStarting().getTitle();
-				String end = ((TransitRouteLine.TransitStep) step).getExit().getTitle();
+
 				
 				nodeIndex++;
 
@@ -733,6 +761,18 @@ public class RoutePlanActivity extends BaseActivity implements
 
 	@Override
 	public void processMessage(Message message) {
+		
+		
+		if(voice_flag && bluetooth_flag && path_flag){
+			//TODO 测试方法
+			//StartRead("请根据提示说出终点", Config.ACK_SAY_END);
+			StartRoute();
+			voice_flag = false;
+			bluetooth_flag = false;
+			path_flag = false;
+		}
+		
+		
 		switch (message.what) {
 		case Config.ACK_OPEN_ROUTE:
 			// StartRead("请根据提示说出起点和终点", Config.ACK_SAY_START);
@@ -745,17 +785,17 @@ public class RoutePlanActivity extends BaseActivity implements
 			StartListen(Config.ACK_SAY_END);
 			// StartListen(Config.ACK_START_SEND);
 			break;
-		case Config.ACK_VOICE_SERVICE:
-			if(counter==1){
-				editSt.setText((String) message.obj);
-				StartRead("终点", Config.ACK_LISTEN_END);			
-				counter=2;
-			} else if(counter==2){
-				editEn.setText((String) message.obj);
-				StartRoute();
-				counter=0;
-			}
-			break;
+//		case Config.ACK_VOICE_SERVICE:
+//			if(counter==1){
+//				editSt.setText((String) message.obj);
+//				StartRead("终点", Config.ACK_LISTEN_END);			
+//				counter=2;
+//			} else if(counter==2){
+//				editEn.setText((String) message.obj);
+//				StartRoute();
+//				counter=0;
+//			}
+//			break;
 		case Config.ACK_SAY_END:
 			editSt.setText((String) message.obj);
 			StartRead("终点", Config.ACK_LISTEN_END);
@@ -763,7 +803,7 @@ public class RoutePlanActivity extends BaseActivity implements
 		case Config.ACK_LISTEN_END:
 			StartListen(Config.ACK_START_ROUTE);
 			break;
-		case Config.ACK_START_ROUTE:
+		case Config.ACK_START_ROUTE:   // start route plan 
 			/* old */
 			editEn.setText((String) message.obj);
 			StartRoute();
@@ -777,18 +817,23 @@ public class RoutePlanActivity extends BaseActivity implements
 			String next = (String) message.obj;
 			StartRead(next, Config.ACK_NONE);
 			break;
-		case Config.FAIl:
+		case Config.ACK_CHECKPOINT_FAIL:
 			StartRead("失败", Config.ACK_NONE);
 			break;
 		case Config.ACK_BLUE_SUCCESS:
-			// int bytes = message.arg1;
-			byte[] buffer = (byte[]) message.obj;
-			startpoint = new String(buffer);
-			if (!checkpoint) {
-				StartRead("请根据提示说出终点", Config.ACK_SAY_END);
-			} else {
-				path_binder.CheckPoint(startpoint);
-			}
+			
+			startpoint = (String) message.obj;
+			//TODO 蓝牙测试方法
+			path_binder.CheckPoint(startpoint);
+			//TODO 蓝牙正式方法
+//			checkpoint=true;
+//			if (!checkpoint) {
+//				StartRead("请根据提示说出终点", Config.ACK_SAY_END);
+//			} else {
+//				path_binder.CheckPoint(startpoint);
+//			}		
+			
+			
 			break;
 		case Config.ACK_BLUE_CON_SUCCESS:
 			Log.i(Config.TAG, "bluetooth 连接成功");
@@ -796,7 +841,17 @@ public class RoutePlanActivity extends BaseActivity implements
 		case Config.ACK_END_POINT:
 
 			StartRead("已到达终点", Config.ACK_NONE);
+			//TODO
 			finish();
+			break;
+		case Config.ACK_FINDPATH_SUCCESS:  // path service success
+			
+			StartRead((String)message.obj,Config.ACK_NONE);
+			//TODO 蓝牙测试方法
+			bluetooth_binder.startTimer();
+			break;
+		case Config.ACK_FINDPATH_FAIL:
+			StartRead("找路失败",Config.ACK_NONE);
 			break;
 		default:
 			break;

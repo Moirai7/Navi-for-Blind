@@ -261,7 +261,7 @@ public class PathOperationService extends Service {
 			if (aboutEndLenMap.isEmpty()) {
 				String str = "没有这个地方呢";
 				Message msg = Message.obtain();
-				msg.what = Config.NONEPLACE;
+				msg.what = Config.ACK_FINDPATH_FAIL;
 				msg.obj = str;
 				BaseActivity.sendMessage(msg);
 				return;
@@ -289,7 +289,7 @@ public class PathOperationService extends Service {
 
 			String str = "选路成功，请向" + shortestNodes.get(1) + "走";
 			Message msg = Message.obtain();
-			msg.what = Config.SUCCESS;
+			msg.what = Config.ACK_FINDPATH_SUCCESS;
 			msg.obj = str;
 			BaseActivity.sendMessage(msg);
 			return;
@@ -314,7 +314,7 @@ public class PathOperationService extends Service {
 			else if (checkCurPoint(currentID) == 3) {
 				msg.what = Config.ACK_END_POINT;// Config.FAIL
 			} else {
-				msg.what = Config.FAIl;// Config.FAIL
+				msg.what = Config.ACK_CHECKPOINT_FAIL;// Config.FAIL
 			}
 			msg.obj = str;
 			BaseActivity.sendMessage(msg);
