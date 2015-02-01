@@ -645,7 +645,6 @@ public class PassStartActivity extends BaseActivity implements
 
 	@Override
 	protected void onStop() {
-		// TODO Auto-generated method stub
 		Log.v(TAG, "stop");
 		super.onStop();
 	}
@@ -728,6 +727,7 @@ public class PassStartActivity extends BaseActivity implements
 	public void processMessage(Message message) {
 		
 		if(voice_flag && bluetooth_flag && path_flag){
+			//TODO 测试方法
 			StartRead("请根据提示说出终点", Config.ACK_SAY_END);
 			voice_flag = false;
 			bluetooth_flag = false;
@@ -746,8 +746,6 @@ public class PassStartActivity extends BaseActivity implements
 			StartListen(Config.ACK_SAY_END);
 			break;
 		case Config.ACK_SAY_END:
-			et.setText((String) message.obj);
-			et = (EditText) findViewById(R.id.et_end);
 			
 			StartRead("终点", Config.ACK_LISTEN_END);
 			break;
@@ -760,6 +758,9 @@ public class PassStartActivity extends BaseActivity implements
 			// StartRoute();
 			/* new */
 			// path_binder.findPath("001", (String) message.obj);
+			et.setText((String) message.obj);
+			et = (EditText) findViewById(R.id.et_end);
+			
 			path_binder.findPath("001", (String) message.obj);
 			//TODO 蓝牙测试方法
 			bluetooth_binder.startTimer();
