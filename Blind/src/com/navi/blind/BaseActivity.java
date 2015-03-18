@@ -33,7 +33,6 @@ public abstract class BaseActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		// 判断该Activity是否在LinkedList中，没有在的话就添加上
 		if (!queue.contains(this)) {
@@ -158,10 +157,9 @@ public abstract class BaseActivity extends Activity {
 //			break;
 //		case Menu.FIRST + 6:
 //			Toast.makeText(this, "发送菜单被点击了", Toast.LENGTH_LONG).show();
-			break;
+//			break;
 		}
-        return false;
-		return super.onOptionsItemSelected(item);
+		return false;
 	}
 
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -175,7 +173,6 @@ public abstract class BaseActivity extends Activity {
 								@Override
 								public void onClick(DialogInterface dialog,
 										int which) {
-									// TODO Auto-generated method stub
 									con.clear();
 									finish();
 									int siz = BaseActivity.queue.size();
@@ -196,7 +193,7 @@ public abstract class BaseActivity extends Activity {
 								@Override
 								public void onClick(DialogInterface dialog,
 										int which) {
-									// TODO Auto-generated method stub
+									
 
 								}
 							});
