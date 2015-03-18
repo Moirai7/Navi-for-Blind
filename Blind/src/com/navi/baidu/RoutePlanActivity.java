@@ -844,11 +844,8 @@ public class RoutePlanActivity extends BaseActivity implements
 			//TODO
 			finish();
 			break;
-		case Config.ACK_FINDPATH_SUCCESS:  // path service success
-			
+		case Config.ACK_FINDPATH_SUCCESS:  // path service success			
 			StartRead((String)message.obj,Config.ACK_NONE);
-			//TODO 蓝牙测试方法
-			bluetooth_binder.startTimer();
 			break;
 		case Config.ACK_FINDPATH_FAIL:
 			StartRead("找路失败",Config.ACK_NONE);

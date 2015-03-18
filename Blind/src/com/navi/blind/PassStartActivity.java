@@ -1,8 +1,15 @@
 package com.navi.blind;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Queue;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +18,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Message;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -53,8 +61,11 @@ import com.navi.baidu.BaiduApplication;
 import com.navi.blind.BaseActivity;
 import com.navi.blind.R;
 import com.navi.client.Config;
+import com.navi.client.Conmmunication;
+import com.navi.client.Constant;
 import com.navi.util.BluetoothService;
 import com.navi.util.PathOperationService;
+import com.navi.util.UploadHistoryService.MyLocationListenner;
 import com.navi.voice.*;
 
 /**
@@ -108,12 +119,20 @@ public class PassStartActivity extends BaseActivity implements
 	public static boolean flag_tts = false;
 	public static boolean isFirstLoc = true;
 
-	public static boolean voice_flag, path_flag,bluetooth_flag = false;
+	public static boolean voice_flag= false, path_flag= false,bluetooth_flag = false;
 
 	// 定位
 	LocationClient mLocClient;
 	public MyLocationListenner myListener = new MyLocationListenner();
 	private static String city = "北京";
+
+	private int CURRENT_ACK = -1;
+
+	private Queue<BDLocation> loc_q = new ArrayBlockingQueue<BDLocation>(17);
+	// 定位相关
+	private TimerTask task;
+	private Timer timer;
+	private Conmmunication con= Conmmunication.newInstance();
 
 	// private Intent intent_main_service;
 	private VoiceService.MyBinder voice_binder;
@@ -124,6 +143,7 @@ public class PassStartActivity extends BaseActivity implements
 
 	private String startpoint;
 	private boolean checkpoint = false;
+	private boolean server_checkpoint = false;
 
 	// private Intent intent_path,intent_bluetooth;
 
@@ -281,7 +301,6 @@ public class PassStartActivity extends BaseActivity implements
 		// myBinder = app.getBinder();
 
 		// StartRoute();
-
 	}
 
 	protected void StopListen() {
@@ -671,6 +690,9 @@ public class PassStartActivity extends BaseActivity implements
 
 		@Override
 		public void onReceiveLocation(BDLocation location) {
+			if (location == null) {
+				return;
+			}
 			// map view 销毁后不在处理新接收的位置
 			if (isFirstLoc) {
 
@@ -683,6 +705,12 @@ public class PassStartActivity extends BaseActivity implements
 				isFirstLoc = false;
 
 			}
+
+			if (loc_q.size() == 5) {
+				loc_q.poll();
+			}
+
+			loc_q.add(location);
 		}
 
 		public void onReceivePoi(BDLocation poiLocation) {
@@ -709,7 +737,8 @@ public class PassStartActivity extends BaseActivity implements
 
 			if (total < 100) {
 				StopListen();
-				//StartRead("请根据提示说出起点和终点", Config.ACK_SAY_START);
+				checkpoint = false;
+				//StartRead("导航启动，请根据提示说出起点和终点", Config.ACK_SAY_START);
 			}
 			break;
 		case MotionEvent.ACTION_CANCEL:
@@ -722,12 +751,35 @@ public class PassStartActivity extends BaseActivity implements
 		return true;
 
 	}
+	
+	private void sendHistory(){
+		if(loc_q.size()>0){
+			float loc_fl = loc_q.poll().getRadius();
+			String loc_str = String.valueOf(loc_fl);
+			SimpleDateFormat formatter = new SimpleDateFormat    ("yyyy年MM月dd日    HH:mm:ss     ");     
+			Date curDate = new Date(System.currentTimeMillis());//获取当前时间     
+			String  str  =  formatter.format(curDate);
+			con.setHistory(Constant.userName, loc_str, str);			
+		}
+	}
+	
+	private void sendMessage(String phone, String message){
+		 
+        PendingIntent pi = PendingIntent.getActivity(this, 0, new Intent(this, PassStartActivity.class), 0);
+ 
+        SmsManager sms = SmsManager.getDefault();
+ 
+        sms.sendTextMessage(phone, null, message, pi, null);
+ 
+    }
 
 	@Override
 	public void processMessage(Message message) {
 		
 		if(voice_flag && bluetooth_flag && path_flag){
-			//TODO 测试方法
+			StartRead("服务启动成功",Config.ACK_NOTHING);
+			server_checkpoint = true;
+			//TODO 测试方法，这个StartRead应该注释掉
 			StartRead("请根据提示说出终点", Config.ACK_SAY_END);
 			voice_flag = false;
 			bluetooth_flag = false;
@@ -745,8 +797,7 @@ public class PassStartActivity extends BaseActivity implements
 		case Config.ACK_LISTEN_START:
 			StartListen(Config.ACK_SAY_END);
 			break;
-		case Config.ACK_SAY_END:
-			
+		case Config.ACK_SAY_END:	
 			StartRead("终点", Config.ACK_LISTEN_END);
 			break;
 		case Config.ACK_LISTEN_END:
@@ -760,15 +811,16 @@ public class PassStartActivity extends BaseActivity implements
 			// path_binder.findPath("001", (String) message.obj);
 			et.setText((String) message.obj);
 			et = (EditText) findViewById(R.id.et_end);
-			
+
+			//TODO 此处001应该是前面得到的起点
 			path_binder.findPath("001", (String) message.obj);
-			//TODO 蓝牙测试方法
+			//path_binder.findPath(startpoint, (String) message.obj);
+			//TODO 蓝牙测试方法，应该删除
 			bluetooth_binder.startTimer();
 			break;
 		case Config.ACK_ROUTE_RETURN:
 			// finish();
 			break;
-
 		case Config.SUCCESS:
 			String next = (String) message.obj;
 			StartRead(next, Config.ACK_NONE);
@@ -779,26 +831,46 @@ public class PassStartActivity extends BaseActivity implements
 			break;
 		case Config.ACK_BLUE_SUCCESS:
 			startpoint = (String) message.obj;
-			//TODO 蓝牙测试方法
-			path_binder.CheckPoint(startpoint);
-			//TODO 蓝牙正式方法
-//			checkpoint=true;
-//			if (!checkpoint) {
-//				StartRead("请根据提示说出终点", Config.ACK_SAY_END);
-//			} else {
-//				path_binder.CheckPoint(startpoint);
-//			}
+			if(startpoint == Config.ACK_ISSUE){
+				//TODO 表示发送短信,最好加上当前位置，问高晓旭
+				db.getReceiverAndDetail();
+				sendMessage(Constant.receiver,Constant.detail);
+			}else{
+				//TODO 蓝牙测试方法，应该删除
+				path_binder.CheckPoint(startpoint);
+				//TODO 蓝牙正式方法
+//				if (!checkpoint&&server_checkpoint) {
+//					StartRead("请根据提示说出终点", Config.ACK_SAY_END);
+//					checkpoint = true;
+//				} else {
+//					path_binder.CheckPoint(startpoint);
+//					sendHistory();
+//				}
+			}
 			break;
 		case Config.ACK_BLUE_CON_SUCCESS:
 			Log.i(Config.TAG, "bluetooth 连接成功");
 			break;
 		case Config.ACK_END_POINT:
-
 			StartRead("已到达终点", Config.ACK_NONE);
 			finish();
 			break;
 		case Config.NONEPLACE:
 			StartRead("没有找到地方", Config.ACK_NONE);
+			break;
+		case Config.ACK_NOTHING:
+			break;
+		case Config.ACK_FINDPATH_SUCCESS:  // path service success
+			StartRead((String)message.obj,Config.ACK_NONE);
+			//TODO 蓝牙测试方法
+			bluetooth_binder.startTimer();
+			break;
+		case Config.ACK_FINDPATH_FAIL:
+			StartRead("找路失败",Config.ACK_NONE);
+			StartRead("请根据提示说出终点", Config.ACK_SAY_END);
+			break;
+		case Config.ACK_CHECKPOINT_FAIL:
+			StartRead("失败", Config.ACK_NONE);
 			break;
 		default:
 			break;

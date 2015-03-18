@@ -298,21 +298,23 @@ public class PathOperationService extends Service {
 		public void CheckPoint(String currentID) {
 			// 判断是否偏离路径，返回下一步String
 			String str = null;
-			if (checkCurPoint(currentID) == 3) {
+			int result = checkCurPoint(currentID);
+			if (result == 3) {
 				str = "到了";
-			} else if (checkCurPoint(currentID) == 1) {
+			} else if (result == 1) {
 				str = "正确,继续前进";
-			} else if (checkCurPoint(currentID) == 2) {
+			} else if (result == 2) {
 				int pos = shortestNodes.indexOf(currentID);
 				str = "正确，请向" + shortestNodes.get(pos + 1) + "走";
 			} else {
 				str = "偏离";
-			}
+			}//TODO 问李为什么这里要多次使用checkCurPoint(currentID);
+			//TODO 问李ACK_CHECKPOINT_FAIL是用来干什么的
 			Message msg = Message.obtain();
-			if (checkCurPoint(currentID) == 0)
+			if (result == 0)
 				msg.what = Config.FAIl;
-			else if (checkCurPoint(currentID) == 3) {
-				msg.what = Config.ACK_END_POINT;// Config.FAIL
+			else if (result == 3) {
+				msg.what = Config.ACK_END_POINT;// Config.ACK_END_POINT
 			} else {
 				msg.what = Config.ACK_CHECKPOINT_FAIL;// Config.FAIL
 			}
