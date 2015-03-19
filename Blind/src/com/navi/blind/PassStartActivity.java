@@ -37,6 +37,7 @@ import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.UiSettings;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.overlayutil.DrivingRouteOvelray;
@@ -125,6 +126,7 @@ public class PassStartActivity extends BaseActivity implements
 	LocationClient mLocClient;
 	public MyLocationListenner myListener = new MyLocationListenner();
 	private static String city = "北京";
+	public String endpoint="unknown";
 
 	private int CURRENT_ACK = -1;
 
@@ -141,7 +143,7 @@ public class PassStartActivity extends BaseActivity implements
 
 	private Context context = this;
 
-	private String startpoint;
+	private String startpoint = "001";
 	private boolean checkpoint = false;
 	private boolean server_checkpoint = false;
 
@@ -211,6 +213,9 @@ public class PassStartActivity extends BaseActivity implements
 			Log.v(Config.TAG, "bind");
 		}
 	};
+	
+	private String startNode;
+	private String endNode;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -381,6 +386,8 @@ public class PassStartActivity extends BaseActivity implements
 		LatLng nodeLocation = null;
 		String nodeTitle = null;
 		Object step = route.getAllStep().get(nodeIndex);
+		
+		
 		if (step instanceof DrivingRouteLine.DrivingStep) {
 			nodeLocation = ((DrivingRouteLine.DrivingStep) step).getEntrace()
 					.getLocation();
@@ -510,15 +517,35 @@ public class PassStartActivity extends BaseActivity implements
 			while (nodeIndex >= 0 && nodeIndex < route.getAllStep().size()) {
 				// 获取节结果信息
 				LatLng nodeLocation = null;
-				String nodeTitle = null;
+				String routeTitle = null;
 				Object step = route.getAllStep().get(nodeIndex);
+
+				
+				String nodeTitle = ((TransitRouteLine.TransitStep) step).getEntrace().getTitle();
+				
 
 				nodeLocation = ((TransitRouteLine.TransitStep) step)
 						.getEntrace().getLocation();
 				nodeTitle = ((TransitRouteLine.TransitStep) step)
 						.getInstructions();
 
-				location += nodeTitle;
+				location += routeTitle;
+				
+				routeTitle = ((TransitRouteLine.TransitStep) step)
+						.getInstructions();
+				
+				String start = route.getStarting().getTitle();
+				String endd = route.getTerminal().getTitle();
+				String end = ((TransitRouteLine.TransitStep) step).getExit().getTitle();
+				
+				String endpoint = routeTitle.substring(routeTitle.indexOf("到达")+2, routeTitle.length());
+				
+				if(routeTitle.indexOf("步行")>=0 && nodeIndex==0){
+					// 调用算路
+					StartRead("正在计算步行路线",Config.ACK_NONE);
+					path_binder.findPath(startpoint, "A");
+					break;
+				}
 
 				nodeIndex++;
 
@@ -690,17 +717,25 @@ public class PassStartActivity extends BaseActivity implements
 
 		@Override
 		public void onReceiveLocation(BDLocation location) {
+			// map view 销毁后不在处理新接收的位置
 			if (location == null) {
 				return;
 			}
-			// map view 销毁后不在处理新接收的位置
+			
+			// 更新地图上点位置
+			MyLocationData locData = new MyLocationData.Builder()
+			.accuracy(location.getRadius())
+			// 此处设置开发者获取到的方向信息，顺时针0-360
+			.direction(100).latitude(location.getLatitude())
+			.longitude(location.getLongitude()).build();
+	mBaidumap.setMyLocationData(locData);
 			if (isFirstLoc) {
 
 				city = location.getCity();
 
-				// Message msg = Message.obtain();
-				// msg.what = Config.ACK_NONE;
-				// BaseActivity.sendMessage(msg);
+				Message msg = Message.obtain();
+				msg.what = Config.ACK_SAY_END;
+				BaseActivity.sendMessage(msg);
 
 				isFirstLoc = false;
 
@@ -711,6 +746,12 @@ public class PassStartActivity extends BaseActivity implements
 			}
 
 			loc_q.add(location);
+			
+			if(!endpoint.equals("unknown")){
+				
+			}
+			
+			// TODO 判定是否到达终点
 		}
 
 		public void onReceivePoi(BDLocation poiLocation) {
@@ -872,6 +913,7 @@ public class PassStartActivity extends BaseActivity implements
 		case Config.ACK_CHECKPOINT_FAIL:
 			StartRead("失败", Config.ACK_NONE);
 			break;
+
 		default:
 			break;
 

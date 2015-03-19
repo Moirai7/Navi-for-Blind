@@ -51,13 +51,14 @@
             android:name="com.navi.baidu.RoutePlanActivity"
             android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="sensor" >
+                       
+        </activity>
+        <activity android:name="com.navi.blind.LoginActivity" >
           <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>                         
-        </activity>
-        <activity android:name="com.navi.blind.LoginActivity" >
+            </intent-filter>          
         </activity>
         <activity android:name="com.navi.blind.RegisterActivity" >
         </activity>
@@ -133,6 +134,7 @@
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.SEND_SMS" />
+	<uses-permission android:name="android.permission.RECEIVE_SMS"/>
     <!-- SDK1.5需要android.permission.GET_TASKS权限判断本程序是否为当前运行的应用? -->
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.CAMERA" >

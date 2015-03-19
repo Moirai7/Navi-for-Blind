@@ -79,10 +79,10 @@ public class RegisterActivity extends BaseActivity {
 				int result = message.arg1;
 				if(result == Config.SUCCESS){
 					Toast.makeText(RegisterActivity.this, username+"注册成功", Toast.LENGTH_SHORT).show();
-					Intent intent = new Intent();
-					intent.setClass(RegisterActivity.this,LoginActivity.class);
-					startActivity(intent);
-					finish();
+					
+					// 下载地图
+					// TODO  处理下载地图完成
+					con.download();
 				}
 				else{
 					Toast.makeText(RegisterActivity.this, username+"注册失败", Toast.LENGTH_SHORT).show();
@@ -90,6 +90,13 @@ public class RegisterActivity extends BaseActivity {
 					edit_password1_reg.setText("");
 					edit_password2_reg.setText("");
 				}
+			}
+			
+			if(message.what == DOWNLOAD_SUCCESS){
+				Intent intent = new Intent();
+				intent.setClass(RegisterActivity.this,LoginActivity.class);
+				startActivity(intent);
+				finish();				
 			}
 		}
 }
