@@ -90,50 +90,5 @@ public class NaviActivity extends BaseActivity {
 		super.onWindowFocusChanged(hasFocus);
 	}
 
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			Builder dialog = new AlertDialog.Builder(NaviActivity.this)
-					.setTitle("提示")
-					.setMessage("您是否要退出？")
-					.setPositiveButton("确定",
-							new DialogInterface.OnClickListener() {
-
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									// TODO Auto-generated method stub
-									con.clear();
-									finish();
-									int siz = BaseActivity.queue.size();
-									for (int i = 0; i < siz; i++) {
-										if (BaseActivity.queue.get(i) != null) {
-											System.out
-													.println((Activity) BaseActivity.queue
-															.get(i) + "退出程序");
-											((Activity) BaseActivity.queue
-													.get(i)).finish();
-										}
-									}
-								}
-							})
-					.setNegativeButton("取消",
-							new DialogInterface.OnClickListener() {
-
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									// TODO Auto-generated method stub
-
-								}
-							});
-			dialog.create().show();
-
-			return true;
-		}
-
-		else
-			return false;
-
-	}
 
 }

@@ -1,4 +1,4 @@
-package com.navi.client;
+package com.moirai.client;
 
 import java.util.List;
 

@@ -91,12 +91,12 @@ public class RegisterActivity extends BaseActivity {
 					edit_password2_reg.setText("");
 				}
 			}
-			
-			if(message.what == DOWNLOAD_SUCCESS){
-				Intent intent = new Intent();
-				intent.setClass(RegisterActivity.this,LoginActivity.class);
-				startActivity(intent);
-				finish();				
-			}
+			//TODO DOWNLOAD_SUCCESS是什么
+//			if(message.what == DOWNLOAD_SUCCESS){
+//				Intent intent = new Intent();
+//				intent.setClass(RegisterActivity.this,LoginActivity.class);
+//				startActivity(intent);
+//				finish();				
+//			}
 		}
 }

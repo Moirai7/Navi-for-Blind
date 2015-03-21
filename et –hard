@@ -1,0 +1,179 @@
+[33mcommit df1100acdf68ca8aadd2c081da3f1c18dc4e3f94[m
+Author: Moirai7 <emma@moirai.cn>
+Date:   Wed Mar 18 18:43:51 2015 +0800
+
+    Update
+
+[33mcommit dd42623de51cceadc0ca14e737e29a8458862e9f[m
+Author: Moirai7 <emma@moirai.cn>
+Date:   Wed Mar 18 18:40:59 2015 +0800
+
+    Update
+
+[33mcommit b9cf987b64a6cf368be6aaed0a88d77eea8d0e7b[m
+Author: chuncaohenli <604265882@qq.com>
+Date:   Sun Feb 1 12:24:06 2015 +0800
+
+    路线规划
+    
+    百度地图与算路合并到routeplanactivity,丢弃passstartactivity
+
+[33mcommit 714a954600926906fb28d2e70b1383784eb88355[m
+Author: Moirai7 <emma@moirai.cn>
+Date:   Sun Feb 1 12:09:55 2015 +0800
+
+    add database
+
+[33mcommit 52eab56a29fbb2a90a363d66d3475485c726f9c6[m
+Author: Moirai7 <emma@moirai.cn>
+Date:   Sun Feb 1 10:04:59 2015 +0800
+
+    change passStart
+
+[33mcommit 1ffa90b3b01b7d54cdb6f2e2a1003c2e05aef817[m
+Author: Moirai7 <emma@moirai.cn>
+Date:   Sat Jan 31 15:53:37 2015 +0800
+
+    change passStart
+    
+    适应于测试
+
+[33mcommit 3426a7ab91849a713de961cb8a3f227eab1b42c0[m
+Author: cantbesure <surelee0@gmail.com>
+Date:   Sat Jan 31 14:08:27 2015 +0800
+
+    refine ver0
+
+[33mcommit dc2f11b6e8e78cfff5d4410e15e7f99029e5e27b[m
+Author: Moirai7 <emma@moirai.cn>
+Date:   Sat Jan 31 12:36:52 2015 +0800
+
+    refine PassStartActivity
+
+[33mcommit 3ddc7242c40eff17b23905b26a8956d44fdacb4d[m
+Author: cantbesure <surelee0@gmail.com>
+Date:   Sat Jan 31 12:33:34 2015 +0800
+
+    refine PassStart
+
+[33mcommit 5a84d2e49601404b9e39bc070f23bc30602f20ae[m
+Author: cantbesure <surelee0@gmail.com>
+Date:   Sat Jan 31 12:29:00 2015 +0800
+
+    refine Bluetooth
+
+[33mcommit ff1c8d3edc038e18aabe7aa2eaeffcfdf8d76f1a[m
+Author: cantbesure <surelee0@gmail.com>
+Date:   Sat Jan 31 12:24:38 2015 +0800
+
+    refine
+
+[33mcommit 929b1475576d500e5f3d1b714da5473e0ba08762[m
+Author: Moirai7 <emma@moirai.cn>
+Date:   Sat Jan 31 12:22:43 2015 +0800
+
+    refine
+
+[33mcommit 09f19edc36c899126c6d9aab8531401269035614[m
+Author: cantbesure <surelee0@gmail.com>
+Date:   Sat Jan 31 12:19:12 2015 +0800
+
+    refine
+
+[33mcommit 04a947292ce43e01fc56d76b6381ba57d249a79f[m
+Author: Moirai7 <emma@moirai.cn>
+Date:   Sat Jan 31 12:11:58 2015 +0800
+
+    refine
+
+[33mcommit bd14918b585e01ab7a2981883fa5976b91c643e2[m
+Author: Moirai7 <emma@moirai.cn>
+Date:   Sat Jan 31 12:09:54 2015 +0800
+
+    refine
+
+[33mcommit c98b24a8169427b183843298caffeff2d39ae918[m
+Author: chuncaohenli <604265882@qq.com>
+Date:   Sat Jan 31 12:02:34 2015 +0800
+
+    refine
+
+[33mcommit 472eb0caceb1a914385fe905b4010f35837c42bc[m
+Author: chuncaohenli <604265882@qq.com>
+Date:   Sat Jan 31 12:01:14 2015 +0800
+
+    Revert "refine"
+    
+    This reverts commit 8fb2656ca979cde815453f745594aae318310418.
+
+[33mcommit 8fb2656ca979cde815453f745594aae318310418[m
+Author: chuncaohenli <604265882@qq.com>
+Date:   Sat Jan 31 12:00:11 2015 +0800
+
+    refine
+
+[33mcommit 157aee6999dadbf7ce77f0abd23475ac64bb9f8e[m
+Author: Moirai7 <emma@moirai.cn>
+Date:   Sat Jan 31 10:50:33 2015 +0800
+
+    add Blind/libs/SpeechApi.jar
+
+[33mcommit 42f1150d5de660ca282c7c33916b0fe48c8e0be5[m
+Author: Moirai7 <emma@moirai.cn>
+Date:   Sat Jan 31 10:48:33 2015 +0800
+
+    add  Blind/libs/locSDK_3.1.jar
+
+[33mcommit 3ab044a5ed4c8cce637213369187c194b2207598[m
+Author: Moirai7 <emma@moirai.cn>
+Date:   Sat Jan 31 10:47:24 2015 +0800
+
+    add Blind/libs/baidumapapi_v3_0_0.jar
+
+[33mcommit fde6ee481f350872bde4fc89f581c31bf8ed3b43[m
+Author: Moirai7 <emma@moirai.cn>
+Date:   Sat Jan 31 10:43:39 2015 +0800
+
+    add Blind/libs/android-support-v4.jar
+
+[33mcommit ad210cd515c757139c609db6fb810a0c7baeea21[m
+Author: Moirai7 <emma@moirai.cn>
+Date:   Sat Jan 31 10:39:42 2015 +0800
+
+    refine
+
+[33mcommit 725afc2fabd372f43ce955fbc94aeae51820bdf2[m
+Author: Moirai7 <emma@moirai.cn>
+Date:   Sat Jan 31 09:42:01 2015 +0800
+
+    refine
+
+[33mcommit 01c1575fbee5a9e26185769bef3f3dda5eea025d[m
+Author: Moirai7 <emma@moirai.cn>
+Date:   Sat Jan 31 09:16:37 2015 +0800
+
+    create
+
+[33mcommit 37728ea404d1c0de29afe8db1985d72809cd5458[m
+Author: Moirai7 <emma@moirai.cn>
+Date:   Sat Jan 31 09:13:27 2015 +0800
+
+    create
+
+[33mcommit c36d5e391cb0d5d81d76681fddf80cf64a71e959[m
+Author: Moirai7 <emma@moirai.cn>
+Date:   Sat Jan 31 09:11:44 2015 +0800
+
+    change
+
+[33mcommit 0a684998f8b5e3244bd96de65dbd4d0d04502f9a[m
+Author: Moirai7 <emma@moirai.cn>
+Date:   Sat Jan 31 09:10:31 2015 +0800
+
+    create
+
+[33mcommit 4749784bc94881ad3846c620b579dcbfc1a995ac[m
+Author: Moirai7 <emma@moirai.cn>
+Date:   Sat Jan 31 08:52:27 2015 +0800
+
+    :space_invader: Added .gitattributes & .gitignore files

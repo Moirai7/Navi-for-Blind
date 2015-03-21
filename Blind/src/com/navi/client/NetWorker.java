@@ -1,4 +1,4 @@
-package com.navi.client;
+package com.moirai.client;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,7 +23,7 @@ import com.navi.client.Config;
 
 public class NetWorker extends Thread {
 	// Context context;
-	private static final String IP = "172.31.12.244";
+	private static final String IP = "172.24.9.0";
 	private static final int PORT = 6666;
 
 	private Socket socket = null;
