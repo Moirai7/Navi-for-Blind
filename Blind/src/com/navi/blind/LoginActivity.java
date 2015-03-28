@@ -24,9 +24,11 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.Toast;
 
 public class LoginActivity extends BaseActivity {
@@ -51,7 +53,6 @@ public class LoginActivity extends BaseActivity {
 		ImageButton bt_log = (ImageButton)findViewById(R.id.login);
 		
 		ImageButton bt_register = (ImageButton)findViewById(R.id.register);
-		
 	
 		
 		bt_log.setOnClickListener(new OnClickListener() {
@@ -61,7 +62,9 @@ public class LoginActivity extends BaseActivity {
 				final String password; 
 				username=edit_username_log.getText().toString();  
 				password=edit_password_log.getText().toString();  
-
+				CheckBox f = (CheckBox)findViewById(R.id.family);
+				if(f.isChecked())
+					Constant.type = "1";
 				con.login(username, password);
 			}
 		});
@@ -87,10 +90,9 @@ public class LoginActivity extends BaseActivity {
 	
 	private void verifylogin() {
 		db = Database.getInstance(this);
-		db.getUserInfo();
-		
-		con.login(Constant.userName, Constant.userPassword);
-		
+		if(db.getUserInfo()){
+			con.login(Constant.userName, Constant.userPassword);
+		}
 	}
 
 	public void processMessage(Message message){
@@ -101,8 +103,14 @@ public class LoginActivity extends BaseActivity {
 			if(result == Config.SUCCESS){
 				Constant.userName = edit_username_log.getText().toString();
 				Constant.userPassword = edit_password_log.getText().toString();
-				db.setUserInfo(Constant.userName,Constant.userPassword);
-				
+				db.setUserInfo(Constant.userName,Constant.userPassword,Constant.type);
+				if(Constant.type.equals("1")){
+					Toast.makeText(LoginActivity.this, "用户"+Constant.userName+"登陆成功", Toast.LENGTH_SHORT).show();
+					Intent intent = new Intent();
+					intent.setClass(LoginActivity.this,ShowPositionActivity.class);
+					startActivity(intent);
+					finish();
+				}
 				Toast.makeText(LoginActivity.this, "用户"+Constant.userName+"登陆成功", Toast.LENGTH_SHORT).show();
 				Intent intent = new Intent();
 				intent.setClass(LoginActivity.this,MainActivity.class);

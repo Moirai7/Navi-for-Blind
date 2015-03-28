@@ -54,11 +54,7 @@
                        
         </activity>
         <activity android:name="com.navi.blind.LoginActivity" >
-          <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>          
+         
         </activity>
         <activity android:name="com.navi.blind.RegisterActivity" >
         </activity>
@@ -73,7 +69,11 @@
             </intent-filter>
         </activity>
         <activity android:name="com.navi.blind.PassStartActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter> 
         </activity>
         <service
             android:name="com.baidu.location.f"

@@ -83,6 +83,8 @@ public class RegisterActivity extends BaseActivity {
 					// 下载地图
 					// TODO  处理下载地图完成
 					con.download();
+					Intent intent = new Intent(RegisterActivity.this,PassStartActivity.class);
+					startActivity(intent);
 				}
 				else{
 					Toast.makeText(RegisterActivity.this, username+"注册失败", Toast.LENGTH_SHORT).show();
