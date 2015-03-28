@@ -1,4 +1,4 @@
-package com.moirai.client;
+package com.navi.client;
 
 public interface Config {
 	static final int BASE = 7000;

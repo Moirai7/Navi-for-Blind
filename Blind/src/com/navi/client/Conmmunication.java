@@ -1,4 +1,4 @@
-﻿package com.moirai.client;
+﻿package com.navi.client;
 
 import android.content.Context;
 

@@ -1,4 +1,4 @@
-package com.moirai.client;
+package com.navi.client;
 
 import java.io.BufferedReader;
 import java.io.IOException;
