@@ -48,9 +48,11 @@ public class LoginActivity extends BaseActivity {
 		
 		init();
 
-		Button bt_log = (Button)findViewById(R.id.login);
+		ImageButton bt_log = (ImageButton)findViewById(R.id.login);
 		
-		Button bt_register = (Button)findViewById(R.id.register);
+		ImageButton bt_register = (ImageButton)findViewById(R.id.register);
+		
+	
 		
 		bt_log.setOnClickListener(new OnClickListener() {
 			@Override
@@ -122,8 +124,8 @@ public class LoginActivity extends BaseActivity {
 		//imageView2 = (ImageView) findViewById(R.id.circle_animation);
 		//animationDrawable1 = (AnimationDrawable) imageView1.getBackground();
 		//animationDrawable2 = (AnimationDrawable) imageView2.getBackground();
-		edit_username_log =(EditText)findViewById(R.id.UserName);  
-		edit_password_log =(EditText)findViewById(R.id.pwd); 
+		edit_username_log =(EditText)findViewById(R.id.et_username);  
+		edit_password_log =(EditText)findViewById(R.id.et_psw); 
 	}
 	
 

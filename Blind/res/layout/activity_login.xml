@@ -1,34 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent" android:layout_height="fill_parent"
-	android:orientation="vertical" android:background="@drawable/ground_overlay">
-	<TextView android:layout_width="300.0px"
-		android:layout_height="wrap_content" android:text="用户登录"
-		android:gravity="center_horizontal" android:textSize="20px" />
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/background"
+    android:orientation="vertical" >
 
-	<LinearLayout android:orientation="vertical" android:id="@+id/LinearLayout01"
-		android:layout_width="fill_parent" android:layout_height="wrap_content"
-		android:layout_weight="1.0">
-		<TextView android:id="@+id/TextView01" android:layout_width="200.0px"
-			android:layout_height="wrap_content" android:text="@string/username"
-			android:layout_gravity="center_horizontal" />
-		<EditText android:id="@+id/UserName" android:layout_width="200.0px"
-			android:layout_height="wrap_content" android:layout_gravity="center_horizontal" />
-		<TextView android:id="@+id/TextView02" android:layout_width="200.0px"
-			android:layout_height="wrap_content" android:text="@string/password"
-			android:layout_gravity="center_horizontal" />
-		<EditText android:id="@+id/pwd" android:layout_width="200.0px"
-			android:layout_height="wrap_content" android:password="true"
-			android:layout_gravity="center_horizontal" />
-		<LinearLayout android:orientation="horizontal"
-			android:layout_width="fill_parent" android:layout_height="wrap_content">
-			<Button android:layout_marginLeft="60px" android:id="@+id/login"
-				android:layout_width="100dp" android:layout_height="wrap_content"
-				android:text="@string/login" />
-			<Button android:id="@+id/register" android:layout_width="100dp"
-				android:layout_height="wrap_content" android:text="注册" />
-			
-		</LinearLayout>
-	</LinearLayout>
+   <LinearLayout
+        android:id="@+id/LinearLayout01"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1.0"
+        android:gravity="center|center_horizontal|center_vertical"
+        android:orientation="vertical" >
+
+        <ImageView
+            android:id="@+id/iv_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="center"
+            android:src="@drawable/icon" />
+
+
+
+        <EditText
+            android:id="@+id/et_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal" 
+            android:background="@drawable/username"
+            android:layout_margin="10dp"/>
+
+        <EditText
+            android:id="@+id/et_psw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal" 
+            android:background="@drawable/password"
+            android:layout_margin="10dp"/>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center|center_horizontal|center_vertical"
+            android:orientation="vertical" >
+
+            <ImageButton
+                android:id="@+id/login"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="@drawable/login_button" />
+
+            <ImageButton
+                android:id="@+id/register"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="@drawable/register_button"/>
+        </LinearLayout>
+    </LinearLayout>
 
 </LinearLayout>

@@ -36,13 +36,13 @@ public class PathOperationService extends Service {
 	String finalEndNode;
 	String finalStartNode;
 	List<String> shortestNodes = new ArrayList<String>();
-	
-	public void downloadInit(){
+
+	public void downloadInit() {
 		db = Database.getInstance(this);
 		db.setPlace();
 		db.setRoads();
 	}
-	
+
 	// run when sys start
 	public void init() {
 		db = Database.getInstance(this);
@@ -95,22 +95,23 @@ public class PathOperationService extends Service {
 		}
 		shortLenMap.put(NodeID, Len);
 	}
-	
+
 	// (!)all path
 	public void getFindPath(String startNode, Node endNode, double len) {
 		Map<String, String> tmpPath = new HashMap<String, String>();
 		//
-//		if (!nodeID.contains(startNode)&&!nodeID.contains(endNode.nid)){
-//			Path tmpStartPath = allPoints.get(startNode);
-//			Path tmpEndPath = allPoints.get(endNode.nid);
-//			if (tmpStartPath.getStreetID().equals(tmpEndPath.getStreetID())){
-//				minLen = Math.abs(Double.valueOf(startNode)-Double.valueOf(endNode.nid));
-//				path = tmpPath;
-//				finalEndNode = endNode.nid;
-//				finalStartNode = startNode;
-//				return ;
-//			}
-//		}
+		// if (!nodeID.contains(startNode)&&!nodeID.contains(endNode.nid)){
+		// Path tmpStartPath = allPoints.get(startNode);
+		// Path tmpEndPath = allPoints.get(endNode.nid);
+		// if (tmpStartPath.getStreetID().equals(tmpEndPath.getStreetID())){
+		// minLen =
+		// Math.abs(Double.valueOf(startNode)-Double.valueOf(endNode.nid));
+		// path = tmpPath;
+		// finalEndNode = endNode.nid;
+		// finalStartNode = startNode;
+		// return ;
+		// }
+		// }
 		while (!inPath.contains(endNode)) {
 			double mmin = 9999999.0;// max
 			Node fromnode = new Node();
@@ -144,6 +145,45 @@ public class PathOperationService extends Service {
 			finalStartNode = startNode;
 		}
 		return;
+	}
+
+	// 获取下一路口方向
+	protected String getDirection(int curIndex) {
+		String speakOrder = "";
+		Path a, b, c;
+		a = allPoints.get(shortestNodes.get(curIndex - 1));
+		b = allPoints.get(shortestNodes.get(curIndex));
+		c = allPoints.get(shortestNodes.get(curIndex + 1));
+		double x0, x1, x2, y0, y1, y2;
+		x0 = Double.valueOf(a.getPointLatitude());
+		y0 = Double.valueOf(a.getPointLongitude());
+		x1 = Double.valueOf(b.getPointLatitude());
+		y1 = Double.valueOf(b.getPointLongitude());
+		x2 = Double.valueOf(c.getPointLatitude());
+		y2 = Double.valueOf(c.getPointLongitude());
+		// 计算左右
+		if ((y1 - y0) / (x1 - x0) * (x2 - x0) + y0 > y2) {
+			speakOrder = speakOrder + "右";
+		} else {
+			speakOrder = speakOrder + "左";
+		}
+		double v0x, v0y, v1x, v1y;
+		v0x = x1 - x0;
+		v0y = y1 - y0;
+		v1x = x2 - x1;
+		v1y = y2 - y1;
+		// 计算转角（前后）
+		double arc = (v0x * v1x - v0y * v1y)
+				/ (Math.sqrt(v0x * v0x + v0y * v0y) * Math.sqrt(v1x * v1x + v1y
+						* v1y));
+		if (arc == 90) {
+			speakOrder = speakOrder + "";
+		} else if (arc > 90) {
+			speakOrder = speakOrder + "后";
+		} else {
+			speakOrder = speakOrder + "前";
+		}
+		return speakOrder;
 	}
 
 	// find start things
@@ -248,7 +288,7 @@ public class PathOperationService extends Service {
 		public void initStartService() {
 			init();
 		}
-		
+
 		public void downloadInitService() {
 			downloadInit();
 		}
@@ -305,11 +345,12 @@ public class PathOperationService extends Service {
 				str = "正确,继续前进";
 			} else if (result == 2) {
 				int pos = shortestNodes.indexOf(currentID);
-				str = "正确，请向" + shortestNodes.get(pos + 1) + "走";
+				String speakOrder = getDirection(pos); // 寻找方向
+				str = "正确，请向" + speakOrder + shortestNodes.get(pos + 1) + "走";
 			} else {
 				str = "偏离";
-			}//TODO 问李为什么这里要多次使用checkCurPoint(currentID);
-			//TODO 问李ACK_CHECKPOINT_FAIL是用来干什么的
+			}// TODO 问李为什么这里要多次使用checkCurPoint(currentID);
+				// TODO 问李ACK_CHECKPOINT_FAIL是用来干什么的
 			Message msg = Message.obtain();
 			if (result == 0)
 				msg.what = Config.FAIl;
