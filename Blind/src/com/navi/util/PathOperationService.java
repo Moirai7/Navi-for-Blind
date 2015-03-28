@@ -149,7 +149,7 @@ public class PathOperationService extends Service {
 
 	// 获取下一路口方向
 	protected String getDirection(int curIndex) {
-		String speakOrder = "";
+		String speakOrder="";
 		Path a, b, c;
 		a = allPoints.get(shortestNodes.get(curIndex - 1));
 		b = allPoints.get(shortestNodes.get(curIndex));
@@ -161,24 +161,44 @@ public class PathOperationService extends Service {
 		y1 = Double.valueOf(b.getPointLongitude());
 		x2 = Double.valueOf(c.getPointLatitude());
 		y2 = Double.valueOf(c.getPointLongitude());
-		// 计算左右
-		if ((y1 - y0) / (x1 - x0) * (x2 - x0) + y0 > y2) {
-			speakOrder = speakOrder + "右";
-		} else {
-			speakOrder = speakOrder + "左";
+		//计算左右
+		boolean flag=false;
+		if (x0==x1){
+			if (y1>y0) flag=true;
+			if (x1>x2){
+				if (flag)	speakOrder = speakOrder + "右";
+				else speakOrder = speakOrder + "左";
+			} else if (x1<x2){
+				if (flag)	speakOrder = speakOrder + "左";
+				else speakOrder = speakOrder + "右";
+			} else {
+				speakOrder = speakOrder + "前";
+			}
 		}
+		else {
+			double gradient=(y1 - y0) / (x1 - x0);
+			if (gradient>0)
+				flag=true;
+			if ( gradient * (x2 - x0) + y0 > y2) {
+				if (flag)	speakOrder = speakOrder + "右";
+				else speakOrder = speakOrder + "左";
+			} else if (gradient * (x2 - x0) + y0 < y2){
+				if (flag)	speakOrder = speakOrder + "左";
+				else speakOrder = speakOrder + "右";
+			} else {
+				speakOrder = speakOrder + "正";
+			}
+		}
+
 		double v0x, v0y, v1x, v1y;
 		v0x = x1 - x0;
 		v0y = y1 - y0;
 		v1x = x2 - x1;
 		v1y = y2 - y1;
-		// 计算转角（前后）
+		//计算转角（前后）
 		double arc = (v0x * v1x - v0y * v1y)
-				/ (Math.sqrt(v0x * v0x + v0y * v0y) * Math.sqrt(v1x * v1x + v1y
-						* v1y));
-		if (arc == 90) {
-			speakOrder = speakOrder + "";
-		} else if (arc > 90) {
+				/ (Math.sqrt(v0x * v0x + v0y * v0y) * Math.sqrt(v1x * v1x + v1y * v1y));
+		if (arc > 90) {
 			speakOrder = speakOrder + "后";
 		} else {
 			speakOrder = speakOrder + "前";
