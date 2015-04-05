@@ -103,7 +103,7 @@ public class LoginActivity extends BaseActivity {
 			if(result == Config.SUCCESS){
 				Constant.userName = edit_username_log.getText().toString();
 				Constant.userPassword = edit_password_log.getText().toString();
-				db.setUserInfo(Constant.userName,Constant.userPassword,Constant.type);
+				//db.setUserInfo(Constant.userName,Constant.userPassword,Constant.type);
 				if(Constant.type.equals("1")){
 					Toast.makeText(LoginActivity.this, "用户"+Constant.userName+"登陆成功", Toast.LENGTH_SHORT).show();
 					Intent intent = new Intent();

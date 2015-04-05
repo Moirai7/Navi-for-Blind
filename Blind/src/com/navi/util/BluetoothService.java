@@ -271,12 +271,20 @@ public class BluetoothService extends Service {
 								byte[] info = new byte[info_len];
 								System.arraycopy(info_temp, 5, info, 0,
 										info_len);
-								
-								Message msg = Message.obtain();
-								msg.what = Config.ACK_BLUE_SUCCESS;
-								msg.arg1 = info_len;
-								msg.obj = info;
-								BaseActivity.sendMessage(msg);
+								int checkid = info_temp[2];
+								if(checkid!=1){
+									Message msg = Message.obtain();
+									msg.what = Config.ACK_BLUE_SUCCESS;
+									msg.arg1 = info_len;
+									msg.obj = info;
+									BaseActivity.sendMessage(msg);
+								}else{
+									Message msg = Message.obtain();
+									msg.what = Config.ACK_BLUE_M_SUCCESS;
+									msg.arg1 = info_len;
+									msg.obj = info;
+									BaseActivity.sendMessage(msg);
+								}								
 								tempBytes = -1;
 								file_string = "";
 								for (int k = 0; k < info_len; k++) {
