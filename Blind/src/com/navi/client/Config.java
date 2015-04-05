@@ -88,7 +88,7 @@ public interface Config {
 	
 	public static final int ACK_FINDPATH_SUCCESS = 131;
 	
-	public static final int ACK_CHECKPOINT_FAIL = 132;
+	public static final int ACK_CHECKPOINT_SUCCESS = 132;
 	
 	public static final int ACK_FINDPATH_FAIL = 133;
 	
