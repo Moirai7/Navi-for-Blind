@@ -134,7 +134,7 @@ public class PassStartActivity extends BaseActivity implements
 	// 定位相关
 	private TimerTask task;
 	private Timer timer;
-	private Conmmunication con= Conmmunication.newInstance();
+	//private Conmmunication con= Conmmunication.newInstance();
 
 	// private Intent intent_main_service;
 	private VoiceService.MyBinder voice_binder;
@@ -201,8 +201,8 @@ public class PassStartActivity extends BaseActivity implements
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			bluetooth_binder = (BluetoothService.MyBinder) service;
-			//TODO DONE 蓝牙初始化方法
-			bluetooth_binder.startService(context);
+			//TODO 蓝牙初始化方法
+			//bluetooth_binder.startService(context);
 			bluetooth_flag = true;
 			
 			Message msg = Message.obtain();
@@ -216,6 +216,8 @@ public class PassStartActivity extends BaseActivity implements
 	
 	private String startNode;
 	private String endNode;
+	
+	private int flagflag=0;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -818,10 +820,12 @@ public class PassStartActivity extends BaseActivity implements
 	public void processMessage(Message message) {
 		
 		if(voice_flag && bluetooth_flag && path_flag){
+			flagflag++;
+			Log.v("lanlan","服务启动成功");
 			StartRead("服务启动成功",Config.ACK_NOTHING);
 			server_checkpoint = true;
-			//TODO DONE 测试方法，这个StartRead应该注释掉
-			//StartRead("请根据提示说出终点", Config.ACK_SAY_END);
+			//TODO 测试方法，这个StartRead应该注释掉
+			StartRead("请根据提示说出终点", Config.ACK_SAY_END);
 			voice_flag = false;
 			bluetooth_flag = false;
 			path_flag = false;
@@ -838,7 +842,8 @@ public class PassStartActivity extends BaseActivity implements
 		case Config.ACK_LISTEN_START:
 			StartListen(Config.ACK_SAY_END);
 			break;
-		case Config.ACK_SAY_END:	
+		case Config.ACK_SAY_END:
+			Log.i("lanlan", "终点第一次");
 			StartRead("终点", Config.ACK_LISTEN_END);
 			break;
 		case Config.ACK_LISTEN_END:
@@ -850,14 +855,19 @@ public class PassStartActivity extends BaseActivity implements
 			// StartRoute();
 			/* new */
 			// path_binder.findPath("001", (String) message.obj);
-			et.setText((String) message.obj);
-			et = (EditText) findViewById(R.id.et_end);
-
-			//TODO DONE此处001应该是前面得到的起点
-			//path_binder.findPath("001", (String) message.obj);
-			path_binder.findPath(startpoint, (String) message.obj);
-			//TODO DONE蓝牙测试方法，应该删除
-			//bluetooth_binder.startTimer();
+			if(((String)message.obj).equals("LANLANERROR")){
+				StartRead("请重试，终点", Config.ACK_LISTEN_END);
+				Log.i("lanlan", "重试第一次");
+			}else{
+				et.setText((String) message.obj);
+				et = (EditText) findViewById(R.id.et_end);
+	
+				//TODO 此处001应该是前面得到的起点
+				path_binder.findPath("001", (String) message.obj);
+				//path_binder.findPath(startpoint, (String) message.obj);
+				//TODO 蓝牙测试方法，应该删除
+				bluetooth_binder.startTimer();
+			}
 			break;
 		case Config.ACK_ROUTE_RETURN:
 			// finish();
@@ -877,16 +887,16 @@ public class PassStartActivity extends BaseActivity implements
 				db.getReceiverAndDetail();
 				sendMessage(Constant.receiver,Constant.detail);
 			}else{
-				//TODO DONE蓝牙测试方法，应该删除
-				//path_binder.CheckPoint(startpoint);
+				//TODO 蓝牙测试方法，应该删除
+				path_binder.CheckPoint(startpoint);
 				//TODO 蓝牙正式方法
-				if (!checkpoint&&server_checkpoint) {
-					StartRead("请根据提示说出终点", Config.ACK_SAY_END);
-					checkpoint = true;
-				} else {
-					path_binder.CheckPoint(startpoint);
-					//sendHistory();
-				}
+//				if (!checkpoint&&server_checkpoint) {
+//					StartRead("请根据提示说出终点", Config.ACK_SAY_END);
+//					checkpoint = true;
+//				} else {
+//					path_binder.CheckPoint(startpoint);
+//					//sendHistory();
+//				}
 			}
 			break;
 		case Config.ACK_BLUE_M_SUCCESS:
@@ -906,8 +916,8 @@ public class PassStartActivity extends BaseActivity implements
 			break;
 		case Config.ACK_FINDPATH_SUCCESS:  // path service success
 			StartRead((String)message.obj,Config.ACK_NONE);
-			//TODO DONE蓝牙测试方法
-			//bluetooth_binder.startTimer();
+			//TODO 蓝牙测试方法
+			bluetooth_binder.startTimer();
 			break;
 		case Config.ACK_FINDPATH_FAIL:
 			StartRead("找路失败",Config.ACK_NONE);

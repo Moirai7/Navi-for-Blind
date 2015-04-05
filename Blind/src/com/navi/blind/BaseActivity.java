@@ -173,7 +173,7 @@ public abstract class BaseActivity extends Activity {
 								@Override
 								public void onClick(DialogInterface dialog,
 										int which) {
-									con.clear();
+									//con.clear();
 									finish();
 									int siz = BaseActivity.queue.size();
 									for (int i = 0; i < siz; i++) {

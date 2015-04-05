@@ -765,8 +765,8 @@ public class RoutePlanActivity extends BaseActivity implements
 		
 		if(voice_flag && bluetooth_flag && path_flag){
 			//TODO 测试方法
-			//StartRead("请根据提示说出终点", Config.ACK_SAY_END);
-			StartRoute();
+			StartRead("请根据提示说出终点", Config.ACK_SAY_END);
+			//StartRoute();
 			voice_flag = false;
 			bluetooth_flag = false;
 			path_flag = false;
