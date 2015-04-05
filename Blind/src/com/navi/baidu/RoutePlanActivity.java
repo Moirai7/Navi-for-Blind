@@ -817,9 +817,9 @@ public class RoutePlanActivity extends BaseActivity implements
 			String next = (String) message.obj;
 			StartRead(next, Config.ACK_NONE);
 			break;
-		case Config.ACK_CHECKPOINT_FAIL:
-			StartRead("失败", Config.ACK_NONE);
-			break;
+//		case Config.ACK_CHECKPOINT_FAIL:
+//			StartRead("失败", Config.ACK_NONE);
+//			break;
 		case Config.ACK_BLUE_SUCCESS:
 			
 			startpoint = (String) message.obj;

@@ -913,8 +913,8 @@ public class PassStartActivity extends BaseActivity implements
 			StartRead("找路失败",Config.ACK_NONE);
 			StartRead("请根据提示说出终点", Config.ACK_SAY_END);
 			break;
-		case Config.ACK_CHECKPOINT_FAIL:
-			StartRead("失败", Config.ACK_NONE);
+		case Config.ACK_CHECKPOINT_SUCCESS:
+			StartRead((String)message.obj, Config.ACK_NONE);
 			break;
 
 		default:
