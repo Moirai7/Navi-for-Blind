@@ -258,7 +258,11 @@ public class PassStartActivity extends BaseActivity implements
 
 					if (total < 100) {
 						StopListen();
-						//StartRead("请根据提示说出起点和终点", Config.ACK_SAY_START);
+						checkpoint = false;
+						Log.i("lanlan", "开始说");
+						Message msg = Message.obtain();
+						msg.what = Config.ACK_LISTEN_END;
+						BaseActivity.sendMessage(msg);
 					}
 
 					return true;
@@ -781,6 +785,11 @@ public class PassStartActivity extends BaseActivity implements
 			if (total < 100) {
 				StopListen();
 				checkpoint = false;
+				Log.i("lanlan", "开始说");
+				Message msg = Message.obtain();
+				msg.what = Config.ACK_LISTEN_END;
+				BaseActivity.sendMessage(msg);
+				//StartRead("服务启动成功，请根据提示说出终点", Config.ACK_LISTEN_END);
 				//StartRead("导航启动，请根据提示说出起点和终点", Config.ACK_SAY_START);
 			}
 			break;
@@ -822,13 +831,14 @@ public class PassStartActivity extends BaseActivity implements
 		if(voice_flag && bluetooth_flag && path_flag){
 			flagflag++;
 			Log.v("lanlan","服务启动成功");
-			StartRead("服务启动成功",Config.ACK_NOTHING);
+			//StartRead("服务启动成功",Config.ACK_NOTHING);
 			server_checkpoint = true;
 			//TODO 测试方法，这个StartRead应该注释掉
-			StartRead("请根据提示说出终点", Config.ACK_SAY_END);
+			StartRead("服务启动成功", Config.ACK_SAY_END);
 			voice_flag = false;
 			bluetooth_flag = false;
 			path_flag = false;
+			path_binder.downloadInitService();
 		}
 		
 		switch (message.what) {
@@ -843,8 +853,8 @@ public class PassStartActivity extends BaseActivity implements
 			StartListen(Config.ACK_SAY_END);
 			break;
 		case Config.ACK_SAY_END:
-			Log.i("lanlan", "终点第一次");
-			StartRead("终点", Config.ACK_LISTEN_END);
+			Log.i("lanlan", "开始");
+			StartRead("请根据提示说出终点", Config.ACK_NONE);
 			break;
 		case Config.ACK_LISTEN_END:
 			StartListen(Config.ACK_START_ROUTE);
@@ -855,18 +865,17 @@ public class PassStartActivity extends BaseActivity implements
 			// StartRoute();
 			/* new */
 			// path_binder.findPath("001", (String) message.obj);
+			Log.i("lanlan", "找路"+(String)message.obj);
 			if(((String)message.obj).equals("LANLANERROR")){
-				StartRead("请重试，终点", Config.ACK_LISTEN_END);
+				StartRead("请重试，终点", Config.ACK_NONE);
 				Log.i("lanlan", "重试第一次");
 			}else{
 				et.setText((String) message.obj);
 				et = (EditText) findViewById(R.id.et_end);
-	
 				//TODO 此处001应该是前面得到的起点
 				path_binder.findPath("001", (String) message.obj);
 				//path_binder.findPath(startpoint, (String) message.obj);
-				//TODO 蓝牙测试方法，应该删除
-				bluetooth_binder.startTimer();
+				
 			}
 			break;
 		case Config.ACK_ROUTE_RETURN:
@@ -887,6 +896,7 @@ public class PassStartActivity extends BaseActivity implements
 				db.getReceiverAndDetail();
 				sendMessage(Constant.receiver,Constant.detail);
 			}else{
+				Log.i("lanlan", "蓝牙传来消息"+(String)message.obj);
 				//TODO 蓝牙测试方法，应该删除
 				path_binder.CheckPoint(startpoint);
 				//TODO 蓝牙正式方法

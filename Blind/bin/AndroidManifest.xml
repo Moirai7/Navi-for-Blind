@@ -49,11 +49,7 @@
             android:name="com.navi.baidu.RoutePlanActivity"
             android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="sensor" >
-                        <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+                      
         </activity>
         <activity android:name="com.navi.blind.LoginActivity" >
         </activity>
@@ -70,7 +66,11 @@
             </intent-filter>
         </activity>
         <activity android:name="com.navi.blind.PassStartActivity" >
+  <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
 
         <service
