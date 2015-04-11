@@ -84,6 +84,7 @@ public class PassStartActivity extends BaseActivity implements
 	boolean useDefaultIcon = false;
 	private TextView popupText = null;// 泡泡view
 	private View viewCache = null;
+	private String newString;
 
 	// 地图相关，使用继承MapView的MyRouteMapView目的是重写touch事件实现泡泡处理
 	// 如果不处理touch事件，则无需继承，直接使用MapView即可
@@ -201,8 +202,8 @@ public class PassStartActivity extends BaseActivity implements
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			bluetooth_binder = (BluetoothService.MyBinder) service;
-			//TODO 蓝牙初始化方法
-			//bluetooth_binder.startService(context);
+			//TODO DONE 蓝牙初始化方法
+			bluetooth_binder.startService(context);
 			bluetooth_flag = true;
 			
 			Message msg = Message.obtain();
@@ -833,12 +834,12 @@ public class PassStartActivity extends BaseActivity implements
 			Log.v("lanlan","服务启动成功");
 			//StartRead("服务启动成功",Config.ACK_NOTHING);
 			server_checkpoint = true;
-			//TODO 测试方法，这个StartRead应该注释掉
-			StartRead("服务启动成功", Config.ACK_SAY_END);
+			//TODO DONE测试方法，这个StartRead应该注释掉
+			//StartRead("服务启动成功", Config.ACK_SAY_END);
 			voice_flag = false;
 			bluetooth_flag = false;
 			path_flag = false;
-			path_binder.downloadInitService();
+			//path_binder.downloadInitService();
 		}
 		
 		switch (message.what) {
@@ -872,8 +873,11 @@ public class PassStartActivity extends BaseActivity implements
 			}else{
 				et.setText((String) message.obj);
 				et = (EditText) findViewById(R.id.et_end);
-				//TODO 此处001应该是前面得到的起点
-				path_binder.findPath("001", (String) message.obj);
+				//TODO DONE此处001应该是前面得到的起点
+				String temp=(String) message.obj;
+				newString = temp.substring(0,temp.length()-1);
+				//startpoint = "023";
+				path_binder.findPath(startpoint, newString);
 				//path_binder.findPath(startpoint, (String) message.obj);
 				
 			}
@@ -886,8 +890,9 @@ public class PassStartActivity extends BaseActivity implements
 			StartRead(next, Config.ACK_NONE);
 			break;
 		case Config.FAIl:
-			StartRead("失败", Config.ACK_NONE);
-			path_binder.findPath(startpoint, "D");
+			StartRead("已偏离，正在重新查找路线", Config.ACK_NONE);
+			String nowString=(String) message.obj;
+			path_binder.findPath(nowString, newString);
 			break;
 		case Config.ACK_BLUE_SUCCESS:
 			startpoint = (String) message.obj;
@@ -897,16 +902,16 @@ public class PassStartActivity extends BaseActivity implements
 				sendMessage(Constant.receiver,Constant.detail);
 			}else{
 				Log.i("lanlan", "蓝牙传来消息"+(String)message.obj);
-				//TODO 蓝牙测试方法，应该删除
-				path_binder.CheckPoint(startpoint);
-				//TODO 蓝牙正式方法
-//				if (!checkpoint&&server_checkpoint) {
-//					StartRead("请根据提示说出终点", Config.ACK_SAY_END);
-//					checkpoint = true;
-//				} else {
-//					path_binder.CheckPoint(startpoint);
-//					//sendHistory();
-//				}
+				//TODO DONE蓝牙测试方法，应该删除
+				//path_binder.CheckPoint(startpoint);
+				//TODO DONE蓝牙正式方法
+				if (!checkpoint&&server_checkpoint) {
+					StartRead("请根据提示说出终点", Config.ACK_SAY_END);
+					checkpoint = true;
+				} else {
+					path_binder.CheckPoint(startpoint);
+					//sendHistory();
+				}
 			}
 			break;
 		case Config.ACK_BLUE_M_SUCCESS:
@@ -917,7 +922,7 @@ public class PassStartActivity extends BaseActivity implements
 			break;
 		case Config.ACK_END_POINT:
 			StartRead("已到达终点", Config.ACK_NONE);
-			finish();
+			//finish();
 			break;
 		case Config.NONEPLACE:
 			StartRead("没有找到地方", Config.ACK_NONE);
@@ -926,8 +931,8 @@ public class PassStartActivity extends BaseActivity implements
 			break;
 		case Config.ACK_FINDPATH_SUCCESS:  // path service success
 			StartRead((String)message.obj,Config.ACK_NONE);
-			//TODO 蓝牙测试方法
-			bluetooth_binder.startTimer();
+			//TODO DONE蓝牙测试方法
+			//bluetooth_binder.startTimer();
 			break;
 		case Config.ACK_FINDPATH_FAIL:
 			StartRead("找路失败",Config.ACK_NONE);

@@ -1,5 +1,6 @@
 package com.navi.util;
 
+import java.io.Flushable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -70,7 +71,7 @@ public class BluetoothService extends Service {
 			if (mTimer == null) {  
 	            mTimer = new Timer();  
 	        }  
-			final String path[]={"001","002","003","004","005","006","007","008","009","010","011","012","013","014","015","016"};
+			final String path[]={"042","043","010","009","002","001","006","005","004","003","002","001","013","014","015","016"};
 	        
 	        if (mTimerTask == null) {  
 	            mTimerTask = new TimerTask() {  
@@ -78,8 +79,8 @@ public class BluetoothService extends Service {
 	                public void run() {  
 	                    do {  
 	                        try {  
-	                            Log.i(TAG, "sleep(10000)...");  
-	                            Thread.sleep(10000);  
+	                            Log.i(TAG, "sleep(5000)...");  
+	                            Thread.sleep(5000);  
 	                            Message msg = Message.obtain();
 	                			msg.what = Config.ACK_BLUE_SUCCESS;
 	                			msg.arg1 = 3;
@@ -226,12 +227,47 @@ public class BluetoothService extends Service {
 		}
 	};
 
+	public void endFun(int tempBytes,byte[] info_temp){
+		
+		int info_len = info_temp[3];
+		byte[] info = new byte[info_len];
+		System.arraycopy(info_temp, 4, info, 0,
+				info_len);
+		int checkid = info_temp[2];
+		if(checkid!=1){
+			Message msg = Message.obtain();
+			msg.what = Config.ACK_BLUE_SUCCESS;
+			msg.arg1 = info_len;
+			String m_file_string = "";
+			for (int k = 0; k < info_len; k++) {
+				m_file_string += info[k];
+			}
+			msg.obj = m_file_string;
+			BaseActivity.sendMessage(msg);
+		}else{
+			Message msg = Message.obtain();
+			msg.what = Config.ACK_BLUE_M_SUCCESS;
+			msg.arg1 = info_len;
+			String m_file_string = "";
+			for (int k = 0; k < info_len; k++) {
+				m_file_string += info[k];
+			}
+			msg.obj = m_file_string;
+			BaseActivity.sendMessage(msg);
+		}		
+		String file_string = "";
+		for (int k = 0; k < info_len; k++) {
+			file_string += info[k]+",";
+		}
+		Log.i(Config.TAG, file_string);
+	}
 	// ��ȡ���
 	public class readThread extends Thread {
 		public void run() {
 			byte[] buffer = new byte[1024];
 			byte[] info_temp = new byte[0];
 			int bytes;
+			byte end=0;
 			InputStream mmInStream = null;
 			int tempBytes = -1;
 			// ���ڶ�ȡͼƬ
@@ -244,14 +280,31 @@ public class BluetoothService extends Service {
 			while (true) {
 				try {
 					if ((bytes = mmInStream.read(buffer)) > 0) {
-						for (int i = 0; i < bytes; i++) {
-							String file_string = "";
-							if (buffer[i] == 0x40) {// 开始
+						if(end==0x40&&buffer[0]==0x07){
+							Log.i(TAG, "检测到文件开始");
+							info_temp = new byte[1];
+							info_temp[0]=64;
+							tempBytes = 0;
+						}else if(end==0x00&&buffer[0]==0x0d){
+							Log.i(TAG, "检测到文件结束");
+
+							byte[] temp = new byte[tempBytes + 1];
+							System.arraycopy(info_temp, 0, temp, 0,
+									info_temp.length);
+							System.arraycopy(buffer, i, temp,
+									info_temp.length, 1);
+							info_temp = temp;
+							endFun(tempBytes,info_temp);
+							tempBytes = -1;
+							//((Flushable) mmInStream).flush();
+						}
+						for (int i = 1; i < bytes-1; i++) {
+							if (buffer[i] == 0x40&&buffer[i+1]==0x07) {// 开始
 								Log.i(TAG, "检测到文件开始");
 								info_temp = new byte[0];
 								tempBytes = 0;
 							}
-							if (tempBytes != -1 && buffer[i] != 0x0d) {
+							if (tempBytes != -1 && (buffer[i] != 0x00 || buffer[i+1] != 0x0d)) {
 								byte[] temp = new byte[tempBytes + 1];
 								System.arraycopy(info_temp, 0, temp, 0,
 										info_temp.length);
@@ -259,48 +312,30 @@ public class BluetoothService extends Service {
 										info_temp.length, 1);
 								info_temp = temp;
 								tempBytes++;
-							} else if (tempBytes != -1 && buffer[i] == 0x0d) {
+							} else if (tempBytes != -1 && buffer[i] == 0x00 && buffer[i+1] == 0x0d) {
+								Log.i(TAG, "检测到文件结束");
+
 								byte[] temp = new byte[tempBytes + 1];
 								System.arraycopy(info_temp, 0, temp, 0,
 										info_temp.length);
 								System.arraycopy(buffer, i, temp,
 										info_temp.length, 1);
 								info_temp = temp;
-								
-								int info_len = info_temp[4];
-								byte[] info = new byte[info_len];
-								System.arraycopy(info_temp, 5, info, 0,
-										info_len);
-								int checkid = info_temp[2];
-								if(checkid!=1){
-									Message msg = Message.obtain();
-									msg.what = Config.ACK_BLUE_SUCCESS;
-									msg.arg1 = info_len;
-									msg.obj = info;
-									BaseActivity.sendMessage(msg);
-								}else{
-									Message msg = Message.obtain();
-									msg.what = Config.ACK_BLUE_M_SUCCESS;
-									msg.arg1 = info_len;
-									msg.obj = info;
-									BaseActivity.sendMessage(msg);
-								}								
+								endFun(tempBytes,info_temp);
 								tempBytes = -1;
-								file_string = "";
-								for (int k = 0; k < info_len; k++) {
-									file_string += info[k]+",";
-								}
-								Log.i(Config.TAG, file_string);
+								//((Flushable) mmInStream).flush();
 							}
 						}
+						end = buffer[bytes-1];
 					}
-				} catch (IOException e) {
+				} catch(ArrayIndexOutOfBoundsException  e){
+				}catch(NegativeArraySizeException e){
+				}catch (IOException e) {
 					try {
 						mmInStream.close();
 					} catch (IOException e1) {
 						e1.printStackTrace();
 					}
-					break;
 				}
 			}
 		}
