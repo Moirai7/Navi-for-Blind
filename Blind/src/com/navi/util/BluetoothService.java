@@ -229,19 +229,28 @@ public class BluetoothService extends Service {
 
 	public void endFun(int tempBytes,byte[] info_temp){
 		
-		int info_len = info_temp[3];
+		int info_len = info_temp[2];
 		byte[] info = new byte[info_len];
-		System.arraycopy(info_temp, 4, info, 0,
+		System.arraycopy(info_temp, 3, info, 0,
 				info_len);
-		int checkid = info_temp[2];
+		int checkid = info_temp[1];
 		if(checkid!=1){
 			Message msg = Message.obtain();
 			msg.what = Config.ACK_BLUE_SUCCESS;
 			msg.arg1 = info_len;
 			String m_file_string = "";
-			for (int k = 0; k < info_len; k++) {
-				m_file_string += info[k];
+			
+			if(lastByte==info[0]){
+				return;
 			}
+			
+			for (int k = 0; k < info_len; k++) {
+				if(info[k]<=0 || info[k] > 45)
+					return;
+				m_file_string += info[k];
+				lastByte=info[k];
+			}
+			m_file_string = "0" + m_file_string;
 			msg.obj = m_file_string;
 			BaseActivity.sendMessage(msg);
 		}else{
@@ -261,13 +270,13 @@ public class BluetoothService extends Service {
 		}
 		Log.i(Config.TAG, file_string);
 	}
+	private byte lastByte=0;
 	// ��ȡ���
 	public class readThread extends Thread {
 		public void run() {
 			byte[] buffer = new byte[1024];
 			byte[] info_temp = new byte[0];
 			int bytes;
-			byte end=0;
 			InputStream mmInStream = null;
 			int tempBytes = -1;
 			// ���ڶ�ȡͼƬ
@@ -279,32 +288,16 @@ public class BluetoothService extends Service {
 
 			while (true) {
 				try {
+					
 					if ((bytes = mmInStream.read(buffer)) > 0) {
-						if(end==0x40&&buffer[0]==0x07){
-							Log.i(TAG, "检测到文件开始");
-							info_temp = new byte[1];
-							info_temp[0]=64;
-							tempBytes = 0;
-						}else if(end==0x00&&buffer[0]==0x0d){
-							Log.i(TAG, "检测到文件结束");
-
-							byte[] temp = new byte[tempBytes + 1];
-							System.arraycopy(info_temp, 0, temp, 0,
-									info_temp.length);
-							System.arraycopy(buffer, i, temp,
-									info_temp.length, 1);
-							info_temp = temp;
-							endFun(tempBytes,info_temp);
-							tempBytes = -1;
-							//((Flushable) mmInStream).flush();
-						}
-						for (int i = 1; i < bytes-1; i++) {
-							if (buffer[i] == 0x40&&buffer[i+1]==0x07) {// 开始
+						
+						for (int i = 0; i < bytes; i++) {
+							if (buffer[i] == 0x40) {// 开始
 								Log.i(TAG, "检测到文件开始");
 								info_temp = new byte[0];
 								tempBytes = 0;
 							}
-							if (tempBytes != -1 && (buffer[i] != 0x00 || buffer[i+1] != 0x0d)) {
+							if (tempBytes != -1 && buffer[i] != -1 ) {
 								byte[] temp = new byte[tempBytes + 1];
 								System.arraycopy(info_temp, 0, temp, 0,
 										info_temp.length);
@@ -312,7 +305,7 @@ public class BluetoothService extends Service {
 										info_temp.length, 1);
 								info_temp = temp;
 								tempBytes++;
-							} else if (tempBytes != -1 && buffer[i] == 0x00 && buffer[i+1] == 0x0d) {
+							} else if (tempBytes != -1 && buffer[i] == -1 ) {
 								Log.i(TAG, "检测到文件结束");
 
 								byte[] temp = new byte[tempBytes + 1];
@@ -326,7 +319,6 @@ public class BluetoothService extends Service {
 								//((Flushable) mmInStream).flush();
 							}
 						}
-						end = buffer[bytes-1];
 					}
 				} catch(ArrayIndexOutOfBoundsException  e){
 				}catch(NegativeArraySizeException e){

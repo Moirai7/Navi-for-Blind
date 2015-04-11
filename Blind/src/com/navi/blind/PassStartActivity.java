@@ -825,7 +825,7 @@ public class PassStartActivity extends BaseActivity implements
         sms.sendTextMessage(phone, null, message, pi, null);
  
     }
-
+	private boolean endCheck=false;
 	@Override
 	public void processMessage(Message message) {
 		
@@ -858,6 +858,7 @@ public class PassStartActivity extends BaseActivity implements
 			StartRead("请根据提示说出终点", Config.ACK_NONE);
 			break;
 		case Config.ACK_LISTEN_END:
+			endCheck=false;
 			StartListen(Config.ACK_START_ROUTE);
 			break;
 		case Config.ACK_START_ROUTE:
@@ -871,6 +872,7 @@ public class PassStartActivity extends BaseActivity implements
 				StartRead("请重试，终点", Config.ACK_NONE);
 				Log.i("lanlan", "重试第一次");
 			}else{
+				endCheck=true;
 				et.setText((String) message.obj);
 				et = (EditText) findViewById(R.id.et_end);
 				//TODO DONE此处001应该是前面得到的起点
@@ -891,8 +893,8 @@ public class PassStartActivity extends BaseActivity implements
 			break;
 		case Config.FAIl:
 			StartRead("已偏离，正在重新查找路线", Config.ACK_NONE);
-			String nowString=(String) message.obj;
-			path_binder.findPath(nowString, newString);
+			//String nowString=(String) message.obj;
+			path_binder.findPath(startpoint, newString);
 			break;
 		case Config.ACK_BLUE_SUCCESS:
 			startpoint = (String) message.obj;
@@ -908,7 +910,7 @@ public class PassStartActivity extends BaseActivity implements
 				if (!checkpoint&&server_checkpoint) {
 					StartRead("请根据提示说出终点", Config.ACK_SAY_END);
 					checkpoint = true;
-				} else {
+				} else if(endCheck){
 					path_binder.CheckPoint(startpoint);
 					//sendHistory();
 				}
