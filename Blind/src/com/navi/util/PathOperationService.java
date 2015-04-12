@@ -157,12 +157,12 @@ public class PathOperationService extends Service {
 		b = allPoints.get(shortestNodes.get(curIndex));
 		c = allPoints.get(shortestNodes.get(curIndex + 1));
 		double x0, x1, x2, y0, y1, y2;
-		x0 = Double.valueOf(a.getPointLatitude());
-		y0 = Double.valueOf(a.getPointLongitude());
-		x1 = Double.valueOf(b.getPointLatitude());
-		y1 = Double.valueOf(b.getPointLongitude());
-		x2 = Double.valueOf(c.getPointLatitude());
-		y2 = Double.valueOf(c.getPointLongitude());
+		x0 = Double.valueOf(a.getPointLongitude());
+		y0 = Double.valueOf(a.getPointLatitude());
+		x1 = Double.valueOf(b.getPointLongitude());
+		y1 = Double.valueOf(b.getPointLatitude());
+		x2 = Double.valueOf(c.getPointLongitude());
+		y2 = Double.valueOf(c.getPointLatitude());
 		// 计算左右
 		boolean flag = false;
 		if (x0 == x1) {
@@ -309,7 +309,7 @@ public class PathOperationService extends Service {
 	// inner_class checkpoint
 	protected int checkCurPoint(String curNodeID) {
 		int pos = shortestNodes.indexOf(curNodeID);
-		if (pos == shortestNodes.size() - 1) {
+		if (curNodeID.equals(aboutEndMap.get(finalEndNode))) {
 			return 3;
 		}
 		if (pos == -1) {
@@ -350,7 +350,7 @@ public class PathOperationService extends Service {
 			getAboutStartLen(startID);
 			getAboutEndLen(endName);
 			if (aboutEndLenMap.isEmpty()) {
-				String str = "没有这个地方呢";
+				String str = "没有这个地方";
 				Message msg = Message.obtain();
 				msg.what = Config.ACK_FINDPATH_FAIL;
 				msg.obj = str;
@@ -379,7 +379,8 @@ public class PathOperationService extends Service {
 			if (!shortestNodes.get(shortestNodes.size()-1).equals(aboutEndMap.get(finalEndNode)))
 			shortestNodes.add(aboutEndMap.get(finalEndNode));
 
-			String str = "选路成功，请向" + shortestNodes.get(1) + "走";
+			//String str = "选路成功，请向" + shortestNodes.get(1) + "走";
+			String str = "选路成功，请向前走";
 			Message msg = Message.obtain();
 			msg.what = Config.ACK_FINDPATH_SUCCESS;
 			msg.obj = str;
