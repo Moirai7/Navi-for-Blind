@@ -45,7 +45,6 @@ public class VoiceService extends Service {
     private Handler handler = new Handler(){
     	@Override
     	public void handleMessage(Message msg) {
-    		// TODO Auto-generated method stub
 			if(flag_iat && flag_tts && flag_binder){
 				//mBinder.StartRead("语音启动");
 				flag_iat = false;
@@ -56,7 +55,6 @@ public class VoiceService extends Service {
 				try {
 					SendServiceBroadCast("语音启动");
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				
@@ -69,7 +67,6 @@ public class VoiceService extends Service {
 				try {
 					SendServiceBroadCast((String)msg.obj);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				break;
@@ -127,7 +124,7 @@ public class VoiceService extends Service {
     	/**
     	 * 开始语音录入
     	 * 
-    	 * @param ack
+    	 *
     	 */
     	public void StartListen() {
 
@@ -152,7 +149,7 @@ public class VoiceService extends Service {
     	 * 
     	 * @param content
     	 *            播报内容
-    	 * @param ack
+    	 *
     	 */
     	public void StartRead(String content) {
 
@@ -167,6 +164,20 @@ public class VoiceService extends Service {
     			showTip("start speak success.");
 
     	}
+
+        public void StopRead() {
+
+            // GLOBAL_MS = ack;
+            //
+            // setParam_Tts();
+            // 设置参数，
+            int code = mTts.stopSpeaking(mTtsListener);
+            if (code != 0) {
+                showTip("start speak error : " + code);
+            } else
+                showTip("start speak success.");
+
+        }
     	
     	public void SetACK(int ack){
     		CURRENT_ACK = ack;
@@ -229,6 +240,10 @@ public class VoiceService extends Service {
 		public void onError(int errorCode) throws RemoteException {
 			//showTip("onError Code：" + errorCode);
 			Log.d(TAG, "onError Code：" + errorCode);
+            Message msg = Message.obtain();
+            msg.what = CURRENT_ACK;
+            msg.obj = "LANLANERROR";
+            BaseActivity.sendMessage(msg);
 		}
 
 		@Override
@@ -325,7 +340,7 @@ public class VoiceService extends Service {
 	/**
 	 * 参数设置
 	 * 
-	 * @param param
+	 * @param
 	 * @return
 	 */
 	public void setParam_Iat() {

@@ -152,17 +152,21 @@ public class PathOperationService extends Service {
 	// 获取下一路口方向
 	protected String getDirection(int curIndex) {
 		String speakOrder="";
+		if (curIndex==0){
+			speakOrder="前";
+			return speakOrder;
+		}
 		Path a, b, c;
 		a = allPoints.get(shortestNodes.get(curIndex - 1));
 		b = allPoints.get(shortestNodes.get(curIndex));
 		c = allPoints.get(shortestNodes.get(curIndex + 1));
 		double x0, x1, x2, y0, y1, y2;
-		x0 = Double.valueOf(a.getPointLatitude());
-		y0 = Double.valueOf(a.getPointLongitude());
-		x1 = Double.valueOf(b.getPointLatitude());
-		y1 = Double.valueOf(b.getPointLongitude());
-		x2 = Double.valueOf(c.getPointLatitude());
-		y2 = Double.valueOf(c.getPointLongitude());
+		x0 = Double.valueOf(a.getPointLongitude());
+		y0 = Double.valueOf(a.getPointLatitude());
+		x1 = Double.valueOf(b.getPointLongitude());
+		y1 = Double.valueOf(b.getPointLatitude());
+		x2 = Double.valueOf(c.getPointLongitude());
+		y2 = Double.valueOf(c.getPointLatitude());
 		// 计算左右
 		boolean flag = false;
 		if (x0 == x1) {
@@ -242,6 +246,10 @@ public class PathOperationService extends Service {
 			return;
 		} else {
 			Path tmpPath = allPoints.get(curNodeID);
+			if (tmpPath==null)
+			{
+				return ;
+			}
 			// String aaa = tmpPath.getStreetID();
 			Road tmpRoad = roads.get(tmpPath.getStreetID());
 			aboutStartLenMap.put(
@@ -309,7 +317,7 @@ public class PathOperationService extends Service {
 	// inner_class checkpoint
 	protected int checkCurPoint(String curNodeID) {
 		int pos = shortestNodes.indexOf(curNodeID);
-		if (pos == shortestNodes.size() - 1) {
+		if (curNodeID.equals(aboutEndMap.get(finalEndNode))) {
 			return 3;
 		}
 		if (pos == -1) {
@@ -348,9 +356,17 @@ public class PathOperationService extends Service {
 			// 查找路径，返回下一步String
 			shortestNodes.clear();
 			getAboutStartLen(startID);
+			if (aboutStartLenMap.isEmpty()) {
+				String str = "没有起点";
+				Message msg = Message.obtain();
+				msg.what = Config.ACK_FINDPATH_FAIL;
+				msg.obj = str;
+				BaseActivity.sendMessage(msg);
+				return;
+			}
 			getAboutEndLen(endName);
 			if (aboutEndLenMap.isEmpty()) {
-				String str = "没有这个地方呢";
+				String str = "没有这个地方";
 				Message msg = Message.obtain();
 				msg.what = Config.ACK_FINDPATH_FAIL;
 				msg.obj = str;
@@ -376,9 +392,17 @@ public class PathOperationService extends Service {
 				shortestNodes.add(0, finalStartNode);
 			if (!shortestNodes.get(0).equals(startID))
 				shortestNodes.add(0, startID);
+			if (!shortestNodes.get(shortestNodes.size()-1).equals(aboutEndMap.get(finalEndNode)))
 			shortestNodes.add(aboutEndMap.get(finalEndNode));
-
+			if (shortestNodes.size()<2){
+				String str = "已到终点";
+				Message msg = Message.obtain();
+				msg.what = Config.ACK_END_POINT;
+				BaseActivity.sendMessage(msg);
+				return;
+			}
 			String str = "选路成功，请向" + shortestNodes.get(1) + "走";
+			//String str = "选路成功，请向前走";
 			Message msg = Message.obtain();
 			msg.what = Config.ACK_FINDPATH_SUCCESS;
 			msg.obj = str;
@@ -389,6 +413,7 @@ public class PathOperationService extends Service {
 		public void CheckPoint(String currentID) {
 			// 判断是否偏离路径，返回下一步String
 			String str = null;
+			String tmpcur=currentID;
 			int result = checkCurPoint(currentID);
 			if (result == 3) {
 				str = "到了";
@@ -397,14 +422,19 @@ public class PathOperationService extends Service {
 			} else if (result == 2) {
 				int pos = shortestNodes.indexOf(currentID);
 				String speakOrder = getDirection(pos); // 寻找方向
-				str = "正确，请向" + speakOrder + shortestNodes.get(pos + 1) + "走";
+				//str = "正确，请向" + speakOrder + shortestNodes.get(pos + 1) + "走";
+				str = "正确，请向" + speakOrder  + "走";
 			} else {
 				str = "偏离";
 			}// TODO 问李为什么这里要多次使用checkCurPoint(currentID);
 				// TODO 问李ACK_CHECKPOINT_FAIL是用来干什么的
 			Message msg = Message.obtain();
-			if (result == 0)
+			if (result == 0){
 				msg.what = Config.FAIl;
+				msg.obj = tmpcur;
+				BaseActivity.sendMessage(msg);
+				return;
+			}
 			else if (result == 3) {
 				msg.what = Config.ACK_END_POINT;// Config.ACK_END_POINT
 			} else {

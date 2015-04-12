@@ -120,7 +120,7 @@ public class Database {
 								.getColumnIndex("pointID"));
 						String pointSI = rs.getString(rs
 								.getColumnIndex("pointSurroundingInfo"));
-						if (pointSI.equals("0"))
+						if (pointSI.equals(""))
 							continue;
 						JSONArray ja = new JSONArray(pointSI);
 						for (int i = 0; i < ja.length(); i++) {
