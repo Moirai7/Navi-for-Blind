@@ -65,6 +65,9 @@ public class BluetoothService extends Service {
 		public void startService(Context context) {
 			init(context);
 		}
+		public void stopService(){
+			shutdownClient();
+		}
 		public void startTimer(){
 			Timer mTimer = null;
 			TimerTask mTimerTask = null;  
@@ -250,7 +253,10 @@ public class BluetoothService extends Service {
 				m_file_string += info[k];
 				lastByte=info[k];
 			}
-			m_file_string = "0" + m_file_string;
+			if(info[0]<10)
+				m_file_string = "00" + m_file_string;
+			else
+				m_file_string = "0" + m_file_string;
 			msg.obj = m_file_string;
 			BaseActivity.sendMessage(msg);
 		}else{
@@ -293,7 +299,7 @@ public class BluetoothService extends Service {
 						
 						for (int i = 0; i < bytes; i++) {
 							if (buffer[i] == 0x40) {// 开始
-								Log.i(TAG, "检测到文件开始");
+								//Log.i(TAG, "检测到文件开始");
 								info_temp = new byte[0];
 								tempBytes = 0;
 							}
@@ -306,7 +312,7 @@ public class BluetoothService extends Service {
 								info_temp = temp;
 								tempBytes++;
 							} else if (tempBytes != -1 && buffer[i] == -1 ) {
-								Log.i(TAG, "检测到文件结束");
+								//Log.i(TAG, "检测到文件结束");
 
 								byte[] temp = new byte[tempBytes + 1];
 								System.arraycopy(info_temp, 0, temp, 0,

@@ -152,6 +152,10 @@ public class PathOperationService extends Service {
 	// 获取下一路口方向
 	protected String getDirection(int curIndex) {
 		String speakOrder="";
+		if (curIndex==0){
+			speakOrder="前";
+			return speakOrder;
+		}
 		Path a, b, c;
 		a = allPoints.get(shortestNodes.get(curIndex - 1));
 		b = allPoints.get(shortestNodes.get(curIndex));
@@ -242,6 +246,10 @@ public class PathOperationService extends Service {
 			return;
 		} else {
 			Path tmpPath = allPoints.get(curNodeID);
+			if (tmpPath==null)
+			{
+				return ;
+			}
 			// String aaa = tmpPath.getStreetID();
 			Road tmpRoad = roads.get(tmpPath.getStreetID());
 			aboutStartLenMap.put(
@@ -348,6 +356,14 @@ public class PathOperationService extends Service {
 			// 查找路径，返回下一步String
 			shortestNodes.clear();
 			getAboutStartLen(startID);
+			if (aboutStartLenMap.isEmpty()) {
+				String str = "没有起点";
+				Message msg = Message.obtain();
+				msg.what = Config.ACK_FINDPATH_FAIL;
+				msg.obj = str;
+				BaseActivity.sendMessage(msg);
+				return;
+			}
 			getAboutEndLen(endName);
 			if (aboutEndLenMap.isEmpty()) {
 				String str = "没有这个地方";
@@ -378,9 +394,15 @@ public class PathOperationService extends Service {
 				shortestNodes.add(0, startID);
 			if (!shortestNodes.get(shortestNodes.size()-1).equals(aboutEndMap.get(finalEndNode)))
 			shortestNodes.add(aboutEndMap.get(finalEndNode));
-
-			//String str = "选路成功，请向" + shortestNodes.get(1) + "走";
-			String str = "选路成功，请向前走";
+			if (shortestNodes.size()<2){
+				String str = "已到终点";
+				Message msg = Message.obtain();
+				msg.what = Config.ACK_END_POINT;
+				BaseActivity.sendMessage(msg);
+				return;
+			}
+			String str = "选路成功，请向" + shortestNodes.get(1) + "走";
+			//String str = "选路成功，请向前走";
 			Message msg = Message.obtain();
 			msg.what = Config.ACK_FINDPATH_SUCCESS;
 			msg.obj = str;

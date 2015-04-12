@@ -197,6 +197,7 @@ public class PassStartActivity extends BaseActivity implements
 
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
+			
 		}
 
 		@Override
@@ -706,6 +707,14 @@ public class PassStartActivity extends BaseActivity implements
 	protected void onDestroy() {
 
 		super.onDestroy();
+		if(connection_voice!=null)
+            unbindService(connection_voice);
+		if(connection_path!=null)
+            unbindService(connection_path);
+		if(connection_bluetooth!=null){
+			bluetooth_binder.stopService();
+            unbindService(connection_bluetooth);
+		}
 
 		// 退出时销毁定位
 		mLocClient.stop();
@@ -766,44 +775,7 @@ public class PassStartActivity extends BaseActivity implements
 		}
 	}
 
-	/**
-	 * 响应触屏事件
-	 */
-	@Override
-	public boolean onTouchEvent(MotionEvent e) {
-
-		switch (e.getAction() & MotionEvent.ACTION_MASK) {// &
-		// MotionEvent.ACTION_MASK 多点
-
-		case MotionEvent.ACTION_DOWN:
-			break;
-		case MotionEvent.ACTION_UP:
-			// RayPickRenderer.flag = !RayPickRenderer.flag;
-			long start = e.getEventTime();
-			long end = e.getDownTime();
-			long total = start - end;
-
-			if (total < 100) {
-				StopListen();
-				checkpoint = false;
-				Log.i("lanlan", "开始说");
-				Message msg = Message.obtain();
-				msg.what = Config.ACK_LISTEN_END;
-				BaseActivity.sendMessage(msg);
-				//StartRead("服务启动成功，请根据提示说出终点", Config.ACK_LISTEN_END);
-				//StartRead("导航启动，请根据提示说出起点和终点", Config.ACK_SAY_START);
-			}
-			break;
-		case MotionEvent.ACTION_CANCEL:
-			break;
-		case MotionEvent.ACTION_POINTER_DOWN:
-			finish();
-			break;
-		}
-
-		return true;
-
-	}
+	
 	
 	private void sendHistory(){
 		if(loc_q.size()>0){
@@ -872,6 +844,7 @@ public class PassStartActivity extends BaseActivity implements
 				StartRead("请重试，终点", Config.ACK_NONE);
 				Log.i("lanlan", "重试第一次");
 			}else{
+				checkpoint = true;
 				endCheck=true;
 				et.setText((String) message.obj);
 				et = (EditText) findViewById(R.id.et_end);
@@ -908,8 +881,8 @@ public class PassStartActivity extends BaseActivity implements
 				//path_binder.CheckPoint(startpoint);
 				//TODO DONE蓝牙正式方法
 				if (!checkpoint&&server_checkpoint) {
-					StartRead("请根据提示说出终点", Config.ACK_SAY_END);
 					checkpoint = true;
+					StartRead("起点为"+startpoint, Config.ACK_SAY_END);
 				} else if(endCheck){
 					path_binder.CheckPoint(startpoint);
 					//sendHistory();
@@ -917,14 +890,15 @@ public class PassStartActivity extends BaseActivity implements
 			}
 			break;
 		case Config.ACK_BLUE_M_SUCCESS:
-			StartRead("前方"+(String)message.obj+"有路障", Config.ACK_SAY_END);
+			StartRead("前方"+(String)message.obj+"有路障", Config.ACK_NONE);
 			break;
 		case Config.ACK_BLUE_CON_SUCCESS:
 			Log.i(Config.TAG, "bluetooth 连接成功");
 			break;
 		case Config.ACK_END_POINT:
 			StartRead("已到达终点", Config.ACK_NONE);
-			//finish();
+			checkpoint = false;
+			endCheck=false;
 			break;
 		case Config.NONEPLACE:
 			StartRead("没有找到地方", Config.ACK_NONE);
@@ -937,8 +911,7 @@ public class PassStartActivity extends BaseActivity implements
 			//bluetooth_binder.startTimer();
 			break;
 		case Config.ACK_FINDPATH_FAIL:
-			StartRead("找路失败",Config.ACK_NONE);
-			StartRead("请根据提示说出终点", Config.ACK_SAY_END);
+			StartRead("未找到地方,请根据提示说出终点", Config.ACK_SAY_END);
 			break;
 		case Config.ACK_CHECKPOINT_SUCCESS:
 			StartRead((String)message.obj, Config.ACK_NONE);
