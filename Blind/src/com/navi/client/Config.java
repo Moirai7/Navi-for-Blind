@@ -96,6 +96,7 @@ public interface Config {
 
 	public static final int ACK_NOTHING = 135;
 	public static final int ACK_BLUE_M_SUCCESS= 136;
+	public static final int ACK_NEWP=137;
 	
 	public static final String ACK_ISSUE = "7777777";
 }

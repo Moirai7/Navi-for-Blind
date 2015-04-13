@@ -804,7 +804,7 @@ public class PassStartActivity extends BaseActivity implements
 		if(voice_flag && bluetooth_flag && path_flag){
 			flagflag++;
 			Log.v("lanlan","服务启动成功");
-			//StartRead("服务启动成功",Config.ACK_NOTHING);
+			StartRead("服务启动成功",Config.ACK_NONE);
 			server_checkpoint = true;
 			//TODO DONE测试方法，这个StartRead应该注释掉
 			//StartRead("服务启动成功", Config.ACK_SAY_END);
@@ -865,8 +865,10 @@ public class PassStartActivity extends BaseActivity implements
 			StartRead(next, Config.ACK_NONE);
 			break;
 		case Config.FAIl:
-			StartRead("已偏离，正在重新查找路线", Config.ACK_NONE);
+			StartRead("已偏离，正在重新查找路线", Config.ACK_NEWP);
 			//String nowString=(String) message.obj;
+			break;
+		case Config.ACK_NEWP:
 			path_binder.findPath(startpoint, newString);
 			break;
 		case Config.ACK_BLUE_SUCCESS:

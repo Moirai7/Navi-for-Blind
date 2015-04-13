@@ -270,11 +270,6 @@ public class BluetoothService extends Service {
 			msg.obj = m_file_string;
 			BaseActivity.sendMessage(msg);
 		}		
-		String file_string = "";
-		for (int k = 0; k < info_len; k++) {
-			file_string += info[k]+",";
-		}
-		Log.i(Config.TAG, file_string);
 	}
 	private byte lastByte=0;
 	// ��ȡ���
@@ -296,7 +291,11 @@ public class BluetoothService extends Service {
 				try {
 					
 					if ((bytes = mmInStream.read(buffer)) > 0) {
-						
+						String file_string = "";
+						for (int k = 0; k < bytes; k++) {
+							file_string += buffer[k]+",";
+						}
+						Log.i(Config.TAG, file_string);
 						for (int i = 0; i < bytes; i++) {
 							if (buffer[i] == 0x40) {// 开始
 								//Log.i(TAG, "检测到文件开始");
