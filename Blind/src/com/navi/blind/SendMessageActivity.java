@@ -22,12 +22,12 @@ import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 public class SendMessageActivity extends BaseActivity {
 	
-	private Button download;
-	private Button save;
+	private ImageButton save;
 	private  EditText detail ;
 	private  EditText receiver;
 	
@@ -40,14 +40,13 @@ public class SendMessageActivity extends BaseActivity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);// 没有标题栏
 		setContentView(R.layout.activity_sendmessage);
 		// view
-		save = (Button) findViewById(R.id.bt_save_detail);
-		download = (Button) findViewById(R.id.bt_downloadmap);
+		save = (ImageButton) findViewById(R.id.bt_save_detail);
 		detail = (EditText)findViewById(R.id.et_detail) ;  
 		receiver = (EditText)findViewById(R.id.et_receiver);
 		
 		
-		con = Conmmunication.newInstance();
-		 db = Database.getInstance(this);
+		//con = Conmmunication.newInstance();
+		 //db = Database.getInstance(this);
 		 
 
 
@@ -56,25 +55,11 @@ public class SendMessageActivity extends BaseActivity {
 			public void onClick(View arg0) {
 				String str_dt = detail.getText().toString();
 				String str_rc = receiver.getText().toString();
-				
-				if(str_dt.equals("") || str_rc.equals("")){
-					Toast.makeText(SendMessageActivity.this, "不能为空", Toast.LENGTH_LONG);
-					Log.v(Config.TAG, "empty");
-				} else{
-					db.setReceiverAndDetail(str_rc,str_dt);
-					con.setRequestInfo(Constant.userName,str_rc,str_dt);
-				}
+				finish();
 				
 			}
 		});
 		
-		download.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				con.getHistory(Constant.userName);				
-			}
-		});		
-
 		
 	}
 

@@ -34,11 +34,13 @@
             android:name="com.navi.blind.SendMessageActivity"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|fontScale"
             android:screenOrientation="portrait" >
+
         </activity>
         <activity
             android:name="com.navi.blind.MainActivity"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|fontScale"
             android:screenOrientation="portrait" >
+            
         </activity>
         <activity
             android:name="com.navi.baidu.LocationActivity"
@@ -52,6 +54,7 @@
                       
         </activity>
         <activity android:name="com.navi.blind.LoginActivity" >
+
         </activity>
         <activity android:name="com.navi.blind.RegisterActivity" >
         </activity>
@@ -59,14 +62,15 @@
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
+                
+                
                 <data
                     android:host="moirai.cn"
                     android:scheme="m" />
             </intent-filter>
         </activity>
         <activity android:name="com.navi.blind.PassStartActivity" >
-  <intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />

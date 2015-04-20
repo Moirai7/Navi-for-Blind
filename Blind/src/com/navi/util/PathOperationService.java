@@ -430,7 +430,7 @@ public class PathOperationService extends Service {
 				// TODO 问李ACK_CHECKPOINT_FAIL是用来干什么的
 			Message msg = Message.obtain();
 			if (result == 0){
-				msg.what = Config.FAIl;
+				msg.what = Config.ACK_PATH_FAIL;
 				msg.obj = tmpcur;
 				BaseActivity.sendMessage(msg);
 				return;

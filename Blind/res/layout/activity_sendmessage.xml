@@ -1,35 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/background"
     android:orientation="vertical" >
+
+   <LinearLayout
+        android:id="@+id/LinearLayout01"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1.0"
+        android:gravity="center|center_horizontal|center_vertical"
+        android:orientation="vertical" >
 
     <EditText
         android:id="@+id/et_detail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="内容" />
+        android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal" 
+            android:background="@drawable/username"
+            android:paddingLeft="45dp"
+            android:layout_margin="10dp"/>
 
     <EditText
         android:id="@+id/et_receiver"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="接受者" />
+        android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal" 
+            android:background="@drawable/password"
+            android:paddingLeft="45dp"
+            android:layout_margin="10dp"/>
 
-    <Button
+    <ImageButton
         android:id="@+id/bt_save_detail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="保存" />
-    
-    <Button
-        android:id="@+id/bt_downloadmap"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="下载地图" />    
-
-    <requestFocus />
-
+       android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="@drawable/save_button" />
+</LinearLayout>
 </LinearLayout>

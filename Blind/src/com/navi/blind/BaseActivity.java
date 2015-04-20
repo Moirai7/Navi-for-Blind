@@ -2,6 +2,7 @@ package com.navi.blind;
 
 import java.util.LinkedList;
 
+import com.navi.client.Config;
 import com.navi.client.Conmmunication;
 import com.navi.util.Database;
 
@@ -141,10 +142,14 @@ public abstract class BaseActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case Menu.FIRST + 1:
-			con.download();
+			Message msg = new Message();
+			msg.what = Config.ACK_SPEAK;
+			BaseActivity.sendMessage(msg);
 			break;
 		case Menu.FIRST + 2:
 			//TODO 跳转到修改联系人的界面
+			Intent intent = new Intent(BaseActivity.this, SendMessageActivity.class);
+			startActivityForResult(intent, Config.ACK_ISSUE2); 
 			break;
 //		case Menu.FIRST + 3:
 //			Toast.makeText(this, "帮助菜单被点击了", Toast.LENGTH_LONG).show();
@@ -161,7 +166,7 @@ public abstract class BaseActivity extends Activity {
 		}
 		return false;
 	}
-
+	
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
 			Builder dialog = new AlertDialog.Builder(BaseActivity.this)

@@ -286,7 +286,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         String a1 = Constant.detail;
         String a2 = Constant.receiver;
         
-        smsManager.sendTextMessage("18811442491", "tom", "http://blind.moirai.cn/?id=" + location, paIntent, 
+        smsManager.sendTextMessage("18811442500", "tom", "http://moirai.cn/blind/?id=" + location, paIntent, 
                 null); 
 	}
 	

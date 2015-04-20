@@ -797,6 +797,10 @@ public class PassStartActivity extends BaseActivity implements
         sms.sendTextMessage(phone, null, message, pi, null);
  
     }
+	@Override 
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) { 
+	    StartRead("保存成功",Config.ACK_NONE);
+	} 
 	private boolean endCheck=false;
 	@Override
 	public void processMessage(Message message) {
@@ -864,12 +868,15 @@ public class PassStartActivity extends BaseActivity implements
 			String next = (String) message.obj;
 			StartRead(next, Config.ACK_NONE);
 			break;
-		case Config.FAIl:
+		case Config.ACK_PATH_FAIL:
 			StartRead("已偏离，正在重新查找路线", Config.ACK_NEWP);
 			//String nowString=(String) message.obj;
 			break;
 		case Config.ACK_NEWP:
 			path_binder.findPath(startpoint, newString);
+			break;
+		case Config.ACK_SPEAK:
+			StartRead("下载更新成功",Config.ACK_NONE);
 			break;
 		case Config.ACK_BLUE_SUCCESS:
 			startpoint = (String) message.obj;

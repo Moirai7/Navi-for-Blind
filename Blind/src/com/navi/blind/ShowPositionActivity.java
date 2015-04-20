@@ -359,32 +359,7 @@ public class ShowPositionActivity extends BaseActivity {
 		}
 	}
 
-	public void addCustomElements(List<LatLng> points) {
 
-		// double la=latLng.latitude;
-		// double lon=latLng.longitude;
-		// // 添加折线
-		// /*LatLng p1 = new LatLng(39.97923, 116.357428);
-		// LatLng p2 = new LatLng(39.94923, 116.397428);
-		// LatLng p3 = new LatLng(39.97923, 116.437428);*/
-		// LatLng p1 = new LatLng(la,lon);
-		// LatLng p2 = new LatLng(la-0.03, lon+0.03);
-		// LatLng p3 = new LatLng(la-0.03, lon);
-		// List<LatLng> points = new ArrayList<LatLng>();
-		// points.add(p1);
-		// points.add(p2);
-		// points.add(p3);
-		if(points.size()>2){
-			OverlayOptions ooPolyline = new PolylineOptions().width(6)
-					.color(0xAAFF0000).points(points);
-			mBaiduMap.addOverlay(ooPolyline);			
-		}
-		
-		
-
-
-
-	}
 	
 	protected void drawText(LatLng llText,String content) {
 		// 构建文字Option对象，用于在地图上添加文字
@@ -393,6 +368,33 @@ public class ShowPositionActivity extends BaseActivity {
 				.position(llText);
 		// 在地图上添加该文字对象并显示
 		mBaiduMap.addOverlay(textOption);		
+	}
+	
+	public void addCustomElements(List<LatLng> points) {
+
+		 double la=39.97923;
+		 double lon=116.357428;
+		 // 添加折线
+		 /*LatLng p1 = new LatLng(39.97923, 116.357428);
+		 LatLng p2 = new LatLng(39.94923, 116.397428);
+		 LatLng p3 = new LatLng(39.97923, 116.437428);*/
+		 LatLng p1 = new LatLng(la,lon);
+		 LatLng p2 = new LatLng(la-0.03, lon+0.03);
+		 LatLng p3 = new LatLng(la-0.03, lon);
+		 List<LatLng> points_fake = new ArrayList<LatLng>();
+		 points.add(p1);
+		 points.add(p2);
+		 points.add(p3);
+		if(points.size()>2){
+			OverlayOptions ooPolyline = new PolylineOptions().width(6)
+					.color(0xAAFF0000).points(points_fake);
+			mBaiduMap.addOverlay(ooPolyline);			
+		}
+		
+		
+
+
+
 	}
 
 }

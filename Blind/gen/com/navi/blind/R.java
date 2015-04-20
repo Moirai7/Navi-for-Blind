@@ -59,17 +59,17 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int pre_=0x7f020021;
         public static final int pre_down_=0x7f020022;
         public static final int register_button=0x7f020023;
-        public static final int username=0x7f020024;
+        public static final int save_button=0x7f020024;
+        public static final int username=0x7f020025;
     }
     public static final class id {
         public static final int LinearLayout01=0x7f080008;
         public static final int bind_service=0x7f080011;
         public static final int bmapView=0x7f080005;
-        public static final int bt_downloadmap=0x7f080025;
         public static final int bt_register=0x7f080021;
         public static final int bt_save_detail=0x7f080024;
         public static final int button1=0x7f080007;
-        public static final int button2=0x7f080026;
+        public static final int button2=0x7f080025;
         public static final int customicon=0x7f08001b;
         public static final int download=0x7f080000;
         public static final int download_his=0x7f080013;
@@ -83,7 +83,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int et_start=0x7f080016;
         public static final int et_username=0x7f08000a;
         public static final int family=0x7f08000c;
-        public static final int history=0x7f080027;
+        public static final int history=0x7f080026;
         public static final int iv=0x7f08001a;
         public static final int iv_logo=0x7f080009;
         public static final int login=0x7f08000d;
